@@ -51,19 +51,15 @@ async function getDistSize(distDir: string) {
 }
 
 async function runBuild(dir: string, noCache: boolean = true) {
-  let startTime = Date.now();
-
   let args = ["run", "parcel", "build", "src/index.js"];
   if (noCache) {
     args.push("--no-cache");
   }
 
   // TODO: Add a `main` field to examples to be able to simply do parcel build and not rely on entrypoiny position
-  await runCommand("yarn", args, {
+  return runCommand("yarn", args, {
     cwd: dir
   });
-
-  return Date.now() - startTime;
 }
 
 async function runParcelExample(
