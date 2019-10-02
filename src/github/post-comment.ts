@@ -30,13 +30,13 @@ export default async function postComment(options: PostCommentOptions) {
     "comments"
   );
 
+  let body = {
+    body: options.content
+  };
+
   try {
     console.log(`POST COMMENT TO ${url}`);
-
-    let body = {
-      body: options.content
-    };
-
+    
     let res = await fetch(url, {
       method: "POST",
       headers,
