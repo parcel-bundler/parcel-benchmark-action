@@ -3,7 +3,7 @@ import fs from "fs-extra";
 
 import runCommand from "./run-command";
 import { PARCEL_EXAMPLES } from "../constants";
-import median from "./median";
+import mean from "./mean";
 
 export type SizesObj = { [key: string]: number };
 
@@ -22,7 +22,7 @@ type BuildOpts = {
   cache?: boolean;
 };
 
-const AMOUNT_OF_RUNS = 3;
+const AMOUNT_OF_RUNS = 2;
 
 // Returns total sizes in bytes per filetype
 async function getRecursizeFileSizes(
@@ -104,8 +104,8 @@ async function runParcelExample(
 
   return {
     name,
-    coldTime: median(coldBuildtimes),
-    hotTime: median(cachedBuildtimes),
+    coldTime: mean(coldBuildtimes),
+    hotTime: mean(cachedBuildtimes),
     size: await getDistSize(
       path.join(exampleDir, benchmarkConfig.outputDir || "dist")
     )

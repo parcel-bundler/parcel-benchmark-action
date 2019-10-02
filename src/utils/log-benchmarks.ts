@@ -23,7 +23,7 @@ function logBuildDuration(benchmark: any, compare: any, key: string) {
 function logBenchmark(benchmark: Benchmark, compare: Benchmark) {
   let res = "";
 
-  res += `### ${benchmark.name}\n\n`;
+  res += `<details><summary>${benchmark.name}</summary><p>\n\n`;
 
   // Timings
   res += `#### Timings\n\n`;
@@ -48,6 +48,8 @@ function logBenchmark(benchmark: Benchmark, compare: Benchmark) {
 
     res += `| ${ext} | ${formattedSize} | ${diffText} |\n`;
   }
+
+  res += "</p></details>";
 
   return res;
 }

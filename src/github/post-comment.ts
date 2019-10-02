@@ -31,15 +31,23 @@ export default async function postComment(options: PostCommentOptions) {
       "comments"
     );
 
+    console.log(`POST COMMENT TO ${url}`);
+
     let body = {
       body: options.content
     };
 
-    await fetch(url, {
+    let res = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body)
     });
+
+    if (res.status !== 200) {
+      throw new Error("POST COMMENT: " + res.statusText);
+    }
+
+    console.log(`Posted comment in ${url}`);
   } catch (e) {
     captureException(e);
 

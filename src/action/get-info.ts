@@ -6,13 +6,11 @@ export default function getInfo() {
     GIT_ROOT_DIR,
     GITHUB_ACTION,
     GITHUB_REPOSITORY,
-    GITHUB_EVENT_PATH,
-    PR_STATS_COMMENT_TOKEN
+    GITHUB_EVENT_PATH
   } = process.env;
 
   if (process.env.GITHUB_TOKEN) {
     delete process.env.GITHUB_TOKEN;
-    delete process.env.PR_STATS_COMMENT_TOKEN;
   }
 
   let info = {
@@ -21,7 +19,7 @@ export default function getInfo() {
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
     prRepo: GITHUB_REPOSITORY || "parcel-bundler/parcel",
     prRef: GITHUB_REF || "console-patch-fix",
-    issueId: `${ISSUE_ID}` || "3"
+    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3"
   };
 
   // get comment
