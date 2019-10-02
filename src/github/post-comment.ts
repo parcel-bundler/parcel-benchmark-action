@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { captureException } from "@sentry/node";
+import { captureException, setExtra } from "@sentry/node";
 import urlJoin from "url-join";
 
 import {
@@ -16,21 +16,21 @@ type PostCommentOptions = {
 };
 
 export default async function postComment(options: PostCommentOptions) {
+  let headers = {
+    Authorization:
+      "Basic " + base64.encode(GITHUB_USERNAME + ":" + GITHUB_PASSWORD)
+  };
+
+  let url = urlJoin(
+    "https://api.github.com/repos",
+    REPO_OWNER,
+    REPO_NAME,
+    "issues",
+    options.issueNumber,
+    "comments"
+  );
+
   try {
-    let headers = {
-      Authorization:
-        "Basic " + base64.encode(GITHUB_USERNAME + ":" + GITHUB_PASSWORD)
-    };
-
-    let url = urlJoin(
-      "https://api.github.com/repos",
-      REPO_OWNER,
-      REPO_NAME,
-      "issues",
-      options.issueNumber,
-      "comments"
-    );
-
     console.log(`POST COMMENT TO ${url}`);
 
     let body = {
@@ -49,6 +49,7 @@ export default async function postComment(options: PostCommentOptions) {
 
     console.log(`Posted comment in ${url}`);
   } catch (e) {
+    setExtra("headers", JSON.stringify(headers));
     captureException(e);
 
     // DO NOT LEAK ANY SECRETS HERE!
