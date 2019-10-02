@@ -17,8 +17,9 @@ async function start() {
   let actionInfo = getActionInfo();
 
   // Skip if invalid request...
-  if (actionInfo.skipClone || !ALLOWED_ACTIONS.has(actionInfo.actionName))
+  if (!ALLOWED_ACTIONS.has(actionInfo.actionName)) {
     return;
+  }
 
   let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
   console.log("Cloning Parcel Repository...");
