@@ -53,8 +53,6 @@ export default async function postComment(options: PostCommentOptions) {
     // DO NOT LEAK ANY SECRETS HERE!
     captureException(e);
 
-    console.error(
-      `An error occured with postComment, posting to ${options.issueNumber}`
-    );
+    console.error("Failed to post to", url);
   }
 }
