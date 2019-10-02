@@ -8,6 +8,7 @@ import yarnInstall from "./yarn/install";
 import benchmark from "./utils/benchmark";
 import logBenchmarks from "./utils/log-benchmarks";
 import fs from "fs-extra";
+import urlJoin from "url-join";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
 
@@ -36,7 +37,7 @@ async function start() {
 
   let prDir = path.join(process.cwd(), ".tmp/parcel-pr");
   console.log("Cloning PR Repository...");
-  await gitClone(actionInfo.prRepo, prDir);
+  await gitClone(urlJoin(actionInfo.gitRoot, actionInfo.prRepo), prDir);
   await gitCheckout(prDir, actionInfo.prRef);
   console.log("Copying benchmarks...");
   await fs.copy(

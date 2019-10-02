@@ -20,7 +20,7 @@ export default function getInfo() {
     actionName: GITHUB_ACTION || "opened",
     githubToken: PR_STATS_COMMENT_TOKEN,
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
-    prRepo: GITHUB_REPOSITORY || "https://github.com/parcel-bundler/parcel.git",
+    prRepo: GITHUB_REPOSITORY || "parcel-bundler/parcel",
     prRef: GITHUB_REF || "console-patch-fix",
     issueId: ISSUE_ID || "1"
   };
