@@ -18,7 +18,8 @@ export default async function postComment(options: PostCommentOptions) {
 
   let headers = {
     Authorization:
-      "Basic " + base64.encode(GITHUB_USERNAME + ":" + options.githubPassword)
+      "Basic " +
+      base64.encode(GITHUB_USERNAME + ":" + options.githubPassword.trim())
   };
 
   let url = urlJoin(
@@ -49,11 +50,11 @@ export default async function postComment(options: PostCommentOptions) {
 
     console.log(`Posted comment in ${url}`);
   } catch (e) {
+    // DO NOT LEAK ANY SECRETS HERE!
     setExtra("options.githubPassword", JSON.stringify(options.githubPassword));
     captureException(e);
 
-    // DO NOT LEAK ANY SECRETS HERE!
-    throw new Error(
+    console.error(
       `An error occured with postComment, posting to ${options.issueNumber}`
     );
   }
