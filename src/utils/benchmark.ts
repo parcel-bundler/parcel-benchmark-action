@@ -1,8 +1,9 @@
 import path from "path";
+import fs from "fs-extra";
 
 import runCommand from "./run-command";
 import { PARCEL_EXAMPLES } from "../constants";
-import fs from "fs-extra";
+import median from "./median";
 
 export type SizesObj = { [key: string]: number };
 
@@ -21,7 +22,7 @@ type BuildOpts = {
   cache?: boolean;
 };
 
-const AMOUNT_OF_RUNS = 2;
+const AMOUNT_OF_RUNS = 3;
 
 // Returns total sizes in bytes per filetype
 async function getRecursizeFileSizes(
@@ -73,15 +74,17 @@ async function runParcelExample(
 ): Promise<Benchmark> {
   let benchmarkConfig = require(path.join(exampleDir, "benchmark-config.json"));
 
-  let coldRuntime = 0;
+  let coldBuildtimes = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    coldRuntime += await runBuild({
-      dir: exampleDir,
-      entrypoint: benchmarkConfig.entrypoint
-    });
+    coldBuildtimes.push(
+      await runBuild({
+        dir: exampleDir,
+        entrypoint: benchmarkConfig.entrypoint
+      })
+    );
   }
 
-  let hotRuntime = 0;
+  let cachedBuildtimes = [];
   // Create cache...
   await runBuild({
     dir: exampleDir,
@@ -90,17 +93,19 @@ async function runParcelExample(
   });
 
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    hotRuntime += await runBuild({
-      dir: exampleDir,
-      cache: true,
-      entrypoint: benchmarkConfig.entrypoint
-    });
+    cachedBuildtimes.push(
+      await runBuild({
+        dir: exampleDir,
+        cache: true,
+        entrypoint: benchmarkConfig.entrypoint
+      })
+    );
   }
 
   return {
     name,
-    coldTime: coldRuntime / AMOUNT_OF_RUNS,
-    hotTime: hotRuntime / AMOUNT_OF_RUNS,
+    coldTime: median(coldBuildtimes),
+    hotTime: median(cachedBuildtimes),
     size: await getDistSize(
       path.join(exampleDir, benchmarkConfig.outputDir || "dist")
     )

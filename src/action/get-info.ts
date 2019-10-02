@@ -18,11 +18,10 @@ export default function getInfo() {
   let info = {
     skipClone: SKIP_CLONE || false,
     actionName: GITHUB_ACTION || "opened",
-    githubToken: PR_STATS_COMMENT_TOKEN,
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
     prRepo: GITHUB_REPOSITORY || "parcel-bundler/parcel",
     prRef: GITHUB_REF || "console-patch-fix",
-    issueId: ISSUE_ID || "3"
+    issueId: `${ISSUE_ID}` || "3"
   };
 
   // get comment
