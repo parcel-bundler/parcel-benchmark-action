@@ -1,4 +1,5 @@
 import path from "path";
+import * as Sentry from "@sentry/node";
 
 import getActionInfo from "./action/get-info";
 
@@ -14,6 +15,10 @@ const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
 
 const BASE_REPO = "https://github.com/parcel-bundler/parcel.git";
 const BASE_BRANCH = "v2";
+
+Sentry.init({
+  dsn: "https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535"
+});
 
 async function start() {
   let actionInfo = getActionInfo();
@@ -53,7 +58,13 @@ async function start() {
   console.log("Benchmarking PR Repo...");
   let prBenchmarks = await benchmark(prDir);
 
-  logBenchmarks({ base: baseBenchmarks, pr: prBenchmarks });
+  await logBenchmarks(
+    { base: baseBenchmarks, pr: prBenchmarks },
+    { githubIssue: actionInfo.issueId }
+  );
+
+  // This ensures Sentry has all errors before we stop the process...
+  await Sentry.flush();
 }
 
 start();

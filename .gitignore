@@ -7,3 +7,6 @@ node_modules
 *-log
 *-log.json
 .parcel-cache
+
+# Temporary file...
+secrets.json

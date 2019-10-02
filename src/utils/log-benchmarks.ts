@@ -1,65 +1,80 @@
-import chalk from "chalk";
-
 import { Benchmarks, Benchmark } from "./benchmark";
 import sizeFormatter from "./size-formatter";
 import timeFormatter from "./time-formatter";
 
+import postComment from "../github/post-comment";
+
 // TODO: Tweak these...
 const TIMEDIFF_TRESHOLD = 100;
-const SLOW_TIME_TRESHOLD = 15000;
-const LARGE_SIZE_TRESHOLD = 1024 * 20;
 
 function logBuildDuration(benchmark: any, compare: any, key: string) {
   let timeDiff = benchmark[key] - compare[key];
   let timeDiffText =
     Math.abs(timeDiff) > TIMEDIFF_TRESHOLD
-      ? `(${timeDiff < 0 ? "-" : "+"}${timeFormatter(Math.abs(timeDiff))})`
-      : "";
+      ? `${timeDiff < 0 ? "-" : "+"}${timeFormatter(Math.abs(timeDiff))} ${
+          timeDiff < 0 ? "🎉" : "⚠️"
+        }`
+      : "0ms";
   let formattedTime = timeFormatter(benchmark[key]);
 
-  return `${
-    benchmark[key] > SLOW_TIME_TRESHOLD
-      ? chalk.red(formattedTime)
-      : chalk.green(formattedTime)
-  } ${timeDiff > 0 ? chalk.red(timeDiffText) : chalk.green(timeDiffText)}`;
+  return `${formattedTime} | ${timeDiffText}`;
 }
 
 function logBenchmark(benchmark: Benchmark, compare: Benchmark) {
-  console.log("Benchmark:", benchmark.name);
+  let res = "";
 
-  console.log(
-    "Cold build took:",
-    logBuildDuration(benchmark, compare, "coldTime")
-  );
-  console.log(
-    "Cached build took:",
-    logBuildDuration(benchmark, compare, "hotTime")
-  );
+  res += `### ${benchmark.name}\n\n`;
 
-  console.log("=== Sizes ===");
+  // Timings
+  res += `#### Timings\n\n`;
+  res += `| Description | Time | Difference |\n`;
+  res += `| --- | --- | --- |\n`;
+  res += `| Cold | ${logBuildDuration(benchmark, compare, "coldTime")} |\n`;
+  res += `| Cached | ${logBuildDuration(benchmark, compare, "hotTime")} |\n`;
+  res += "\n";
+
+  // Bundle Sizes
+  res += `#### Bundle Sizes\n\n`;
+  res += `| Extension | Size | Difference |\n`;
+  res += `| --- | --- | --- |\n`;
   for (let ext in benchmark.size) {
     let diff = benchmark.size[ext] - compare.size[ext];
     let diffText = diff
-      ? `(${diff < 0 ? "-" : "+"}${sizeFormatter(Math.abs(diff))})`
-      : "";
+      ? `${diff < 0 ? "-" : "+"}${sizeFormatter(Math.abs(diff))} ${
+          diff < 0 ? "🎉" : "⚠️"
+        }`
+      : "0b";
     let formattedSize = sizeFormatter(benchmark.size[ext]);
 
-    console.log(
-      `${ext.toUpperCase()}:`,
-      benchmark.size[ext] > LARGE_SIZE_TRESHOLD
-        ? chalk.red(formattedSize)
-        : chalk.green(formattedSize),
-      diffText
-    );
+    res += `| ${ext} | ${formattedSize} | ${diffText} |\n`;
   }
+
+  return res;
 }
 
-export default function logBenchmarks(benchmarks: {
+type BenchMarksObj = {
   base: Benchmarks;
   pr: Benchmarks;
-}) {
-  console.log("=== Benchmark Results ===");
+};
+
+type LoggerOptions = {
+  githubIssue: string;
+};
+
+export default async function logBenchmarks(
+  benchmarks: BenchMarksObj,
+  options: LoggerOptions
+) {
+  let content = "## Benchmark Results\n";
   for (let i = 0; i < benchmarks.pr.length; i++) {
-    logBenchmark(benchmarks.pr[i], benchmarks.base[i]);
+    content += logBenchmark(benchmarks.pr[i], benchmarks.base[i]);
+    content += "\n\n";
   }
+
+  console.log(content);
+
+  await postComment({
+    issueNumber: options.githubIssue,
+    content: content
+  });
 }

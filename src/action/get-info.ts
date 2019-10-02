@@ -22,7 +22,7 @@ export default function getInfo() {
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
     prRepo: GITHUB_REPOSITORY || "parcel-bundler/parcel",
     prRef: GITHUB_REF || "console-patch-fix",
-    issueId: ISSUE_ID || "1"
+    issueId: ISSUE_ID || "3"
   };
 
   // get comment
