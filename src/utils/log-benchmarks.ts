@@ -61,6 +61,7 @@ type BenchMarksObj = {
 
 type LoggerOptions = {
   githubIssue: string;
+  githubPassword: string;
 };
 
 export default async function logBenchmarks(
@@ -77,6 +78,7 @@ export default async function logBenchmarks(
 
   await postComment({
     issueNumber: options.githubIssue,
-    content: content
+    content: content,
+    githubPassword: options.githubPassword
   });
 }

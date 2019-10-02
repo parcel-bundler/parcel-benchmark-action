@@ -60,7 +60,10 @@ async function start() {
 
   await logBenchmarks(
     { base: baseBenchmarks, pr: prBenchmarks },
-    { githubIssue: actionInfo.issueId }
+    {
+      githubIssue: actionInfo.issueId,
+      githubPassword: actionInfo.githubPassword
+    }
   );
 
   // This ensures Sentry has all errors before we stop the process...

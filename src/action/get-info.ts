@@ -6,11 +6,17 @@ export default function getInfo() {
     GIT_ROOT_DIR,
     GITHUB_ACTION,
     GITHUB_REPOSITORY,
-    GITHUB_EVENT_PATH
+    GITHUB_EVENT_PATH,
+    BOT_GITHUB_PASSWORD
   } = process.env;
 
   if (process.env.GITHUB_TOKEN) {
     delete process.env.GITHUB_TOKEN;
+    delete process.env.BOT_GITHUB_PASSWORD;
+  }
+
+  if (!BOT_GITHUB_PASSWORD) {
+    throw new Error("BOT_GITHUB_PASSWORD is undefined");
   }
 
   let info = {
@@ -19,7 +25,8 @@ export default function getInfo() {
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
     prRepo: GITHUB_REPOSITORY || "parcel-bundler/parcel",
     prRef: GITHUB_REF || "console-patch-fix",
-    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3"
+    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3",
+    githubPassword: BOT_GITHUB_PASSWORD
   };
 
   // get comment

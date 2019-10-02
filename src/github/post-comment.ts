@@ -4,7 +4,6 @@ import urlJoin from "url-join";
 
 import {
   GITHUB_USERNAME,
-  GITHUB_PASSWORD,
   REPO_OWNER,
   REPO_NAME
 } from "../constants";
@@ -13,12 +12,13 @@ import * as base64 from "../utils/base64";
 type PostCommentOptions = {
   issueNumber: string;
   content: string;
+  githubPassword: string;
 };
 
 export default async function postComment(options: PostCommentOptions) {
   let headers = {
     Authorization:
-      "Basic " + base64.encode(GITHUB_USERNAME + ":" + GITHUB_PASSWORD)
+      "Basic " + base64.encode(GITHUB_USERNAME + ":" + options.githubPassword)
   };
 
   let url = urlJoin(
