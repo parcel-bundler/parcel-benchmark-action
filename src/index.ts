@@ -14,8 +14,8 @@ const BASE_BRANCH = "v2";
 async function start() {
   let actionInfo = getActionInfo();
 
-  // Skip everything...
-  if (actionInfo.skipClone) return;
+  // Skip if invalid request...
+  if (actionInfo.skipClone || !ALLOWED_ACTIONS.has(actionInfo.actionName)) return;
 
   let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
   console.log("Cloning Parcel Repository...");
