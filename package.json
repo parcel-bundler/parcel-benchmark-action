@@ -9,8 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "yarn clean && node src/index",
-    "build-docker": "yarn clean && docker build -t parcel/benchmark .",
-    "start-docker": ""
+    "docker-build": "yarn clean && docker build -t parcel/benchmark .",
+    "docker-start": "docker run -i -t parcel/benchmark"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
