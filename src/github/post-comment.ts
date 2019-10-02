@@ -44,9 +44,7 @@ export default async function postComment(options: PostCommentOptions) {
       body: JSON.stringify(body)
     });
 
-    console.log(res.status);
-
-    if (res.status !== 200) {
+    if (!res.ok) {
       throw new Error("POST COMMENT: " + res.statusText);
     }
 
