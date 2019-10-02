@@ -5,10 +5,11 @@
   "author": "Jasper De Moor <jasperdemoor@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "clean": "rm -rf .tmp",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "rm -rf .tmp && node src/index",
-    "build-docker": "docker build -t parcel/benchmark .",
+    "start": "yarn clean && node src/index",
+    "build-docker": "yarn clean && docker build -t parcel/benchmark .",
     "start-docker": ""
   },
   "devDependencies": {
