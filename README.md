@@ -11,3 +11,5 @@ Any contributions are welcome from new benchmark applications to code improvemen
 ### Adding benchmarks
 
 To create a new benchmark application, create a new folder in the benchmarks folder similar to existing benchmark applications in this folder.
+
+The only requirement for a benchmark is that it cannot contain any third party Parcel plugins, as these aren't maintained by the Parcel core team and are not very useful for testing Parcel's core performance.
