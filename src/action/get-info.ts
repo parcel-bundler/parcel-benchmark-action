@@ -31,7 +31,7 @@ export default function getInfo() {
     if (prData) {
       info.prRepo = prData.head.repo.full_name;
       info.prRef = prData.head.ref;
-      info.issueId = prData.number;
+      info.issueId = prData.number.toString();
     }
   }
 
