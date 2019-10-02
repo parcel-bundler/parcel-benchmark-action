@@ -1,0 +1,22 @@
+{
+  "name": "parcel-benchmark-action",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jasper De Moor <jasperdemoor@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "rm -rf .tmp && node src/index",
+    "build-docker": "docker build -t parcel/benchmark .",
+    "start-docker": ""
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.0",
+    "@types/node": "^12.7.9",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "fs-extra": "^8.1.0"
+  }
+}
