@@ -1,0 +1,34 @@
+{
+  "name": "@parcel/kitchen-sink-benchmark",
+  "version": "2.0.0-alpha.1.1",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@parcel/babel-register": "^2.0.0-alpha.1.1",
+    "@parcel/config-default": "^2.0.0-alpha.1.1",
+    "parcel": "^2.0.0-alpha.1.1"
+  },
+  "browser": "dist/legacy/index.js",
+  "browserModern": "dist/modern/index.js",
+  "targets": {
+    "browserModern": {
+      "engines": {
+        "browsers": [
+          "last 1 Chrome version"
+        ]
+      }
+    },
+    "browser": {
+      "engines": {
+        "browsers": [
+          "> 0.25%"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
+  }
+}

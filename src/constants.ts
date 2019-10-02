@@ -1,1 +1,1 @@
-export const PARCEL_EXAMPLES = ["packages/examples/kitchen-sink"];
+export const PARCEL_EXAMPLES = ["packages/benchmarks/kitchen-sink"];

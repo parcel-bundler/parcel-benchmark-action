@@ -6,3 +6,4 @@ node_modules
 *.lock
 *-log
 *-log.json
+.parcel-cache

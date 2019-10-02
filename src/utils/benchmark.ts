@@ -15,6 +15,12 @@ export type Benchmark = {
 
 export type Benchmarks = Array<Benchmark>;
 
+type BuildOpts = {
+  dir: string;
+  entrypoint: string;
+  cache?: boolean;
+};
+
 const AMOUNT_OF_RUNS = 2;
 
 // Returns total sizes in bytes per filetype
@@ -50,15 +56,14 @@ async function getDistSize(distDir: string) {
   return getRecursizeFileSizes(distDir);
 }
 
-async function runBuild(dir: string, noCache: boolean = true) {
-  let args = ["run", "parcel", "build", "src/index.js"];
-  if (noCache) {
+async function runBuild(options: BuildOpts) {
+  let args = ["run", "parcel", "build", options.entrypoint];
+  if (!options.cache) {
     args.push("--no-cache");
   }
 
-  // TODO: Add a `main` field to examples to be able to simply do parcel build and not rely on entrypoiny position
   return runCommand("yarn", args, {
-    cwd: dir
+    cwd: options.dir
   });
 }
 
@@ -66,23 +71,39 @@ async function runParcelExample(
   exampleDir: string,
   name: string
 ): Promise<Benchmark> {
+  let benchmarkConfig = require(path.join(exampleDir, "benchmark-config.json"));
+
   let coldRuntime = 0;
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    coldRuntime += await runBuild(exampleDir);
+    coldRuntime += await runBuild({
+      dir: exampleDir,
+      entrypoint: benchmarkConfig.entrypoint
+    });
   }
 
   let hotRuntime = 0;
-  // Create caches...
-  await runBuild(exampleDir, false);
+  // Create cache...
+  await runBuild({
+    dir: exampleDir,
+    cache: true,
+    entrypoint: benchmarkConfig.entrypoint
+  });
+
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    hotRuntime += await runBuild(exampleDir, false);
+    hotRuntime += await runBuild({
+      dir: exampleDir,
+      cache: true,
+      entrypoint: benchmarkConfig.entrypoint
+    });
   }
 
   return {
     name,
     coldTime: coldRuntime / AMOUNT_OF_RUNS,
     hotTime: hotRuntime / AMOUNT_OF_RUNS,
-    size: await getDistSize(path.join(exampleDir, "dist"))
+    size: await getDistSize(
+      path.join(exampleDir, benchmarkConfig.outputDir || "dist")
+    )
   };
 }
 

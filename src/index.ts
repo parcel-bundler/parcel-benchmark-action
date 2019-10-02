@@ -7,6 +7,7 @@ import gitCheckout from "./git/checkout";
 import yarnInstall from "./yarn/install";
 import benchmark from "./utils/benchmark";
 import logBenchmarks from "./utils/log-benchmarks";
+import fs from "fs-extra";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
 
@@ -25,12 +26,24 @@ async function start() {
   console.log("Cloning Parcel Repository...");
   await gitClone(BASE_REPO, parcelTwoDir);
   await gitCheckout(parcelTwoDir, BASE_BRANCH);
+  console.log("Copying benchmarks...");
+  await fs.copy(
+    path.join(process.cwd(), "benchmarks"),
+    path.join(parcelTwoDir, "packages/benchmarks"),
+    { recursive: true }
+  );
   await yarnInstall(parcelTwoDir);
 
   let prDir = path.join(process.cwd(), ".tmp/parcel-pr");
   console.log("Cloning PR Repository...");
   await gitClone(actionInfo.prRepo, prDir);
   await gitCheckout(prDir, actionInfo.prRef);
+  console.log("Copying benchmarks...");
+  await fs.copy(
+    path.join(process.cwd(), "benchmarks"),
+    path.join(prDir, "packages/benchmarks"),
+    { recursive: true }
+  );
   await yarnInstall(prDir);
 
   console.log("Benchmarking Base Repo...");
