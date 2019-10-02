@@ -51,7 +51,6 @@ export default async function postComment(options: PostCommentOptions) {
     console.log(`Posted comment in ${url}`);
   } catch (e) {
     // DO NOT LEAK ANY SECRETS HERE!
-    setExtra("options.githubPassword", JSON.stringify(options.githubPassword));
     captureException(e);
 
     console.error(
