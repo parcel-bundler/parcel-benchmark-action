@@ -8,11 +8,14 @@ export type SizesObj = { [key: string]: number };
 
 export type Benchmark = {
   name: string;
-  took: number;
+  coldTime: number;
+  hotTime: number;
   size: SizesObj;
 };
 
 export type Benchmarks = Array<Benchmark>;
+
+const AMOUNT_OF_RUNS = 2;
 
 // Returns total sizes in bytes per filetype
 async function getRecursizeFileSizes(
@@ -47,19 +50,42 @@ async function getDistSize(distDir: string) {
   return getRecursizeFileSizes(distDir);
 }
 
+async function runBuild(dir: string, noCache: boolean = true) {
+  let startTime = Date.now();
+
+  let args = ["run", "parcel", "build", "src/index.js"];
+  if (noCache) {
+    args.push("--no-cache");
+  }
+
+  // TODO: Add a `main` field to examples to be able to simply do parcel build and not rely on entrypoiny position
+  await runCommand("yarn", args, {
+    cwd: dir
+  });
+
+  return Date.now() - startTime;
+}
+
 async function runParcelExample(
   exampleDir: string,
   name: string
 ): Promise<Benchmark> {
-  let startTime = Date.now();
-  // TODO: Add a `main` field to examples to be able to simply do parcel build and not rely on entrypoiny position
-  await runCommand("yarn", ["run", "parcel", "build", "src/index.js"], {
-    cwd: exampleDir
-  });
+  let coldRuntime = 0;
+  for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
+    coldRuntime += await runBuild(exampleDir);
+  }
+
+  let hotRuntime = 0;
+  // Create caches...
+  await runBuild(exampleDir, false);
+  for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
+    hotRuntime += await runBuild(exampleDir, false);
+  }
 
   return {
     name,
-    took: Date.now() - startTime,
+    coldTime: coldRuntime / AMOUNT_OF_RUNS,
+    hotTime: hotRuntime / AMOUNT_OF_RUNS,
     size: await getDistSize(path.join(exampleDir, "dist"))
   };
 }

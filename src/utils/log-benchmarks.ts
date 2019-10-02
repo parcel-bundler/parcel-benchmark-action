@@ -9,22 +9,31 @@ const TIMEDIFF_TRESHOLD = 100;
 const SLOW_TIME_TRESHOLD = 15000;
 const LARGE_SIZE_TRESHOLD = 1024 * 20;
 
-function logBenchmark(benchmark: Benchmark, compare: Benchmark) {
-  console.log("Benchmark:", benchmark.name);
-
-  let timeDiff = benchmark.took - compare.took;
+function logBuildDuration(benchmark: any, compare: any, key: string) {
+  let timeDiff = benchmark[key] - compare[key];
   let timeDiffText =
     Math.abs(timeDiff) > TIMEDIFF_TRESHOLD
       ? `(${timeDiff < 0 ? "-" : "+"}${timeFormatter(Math.abs(timeDiff))})`
       : "";
-  let formattedTime = timeFormatter(benchmark.took);
+  let formattedTime = timeFormatter(benchmark[key]);
+
+  return `${
+    benchmark[key] > SLOW_TIME_TRESHOLD
+      ? chalk.red(formattedTime)
+      : chalk.green(formattedTime)
+  } ${timeDiff > 0 ? chalk.red(timeDiffText) : chalk.green(timeDiffText)}`;
+}
+
+function logBenchmark(benchmark: Benchmark, compare: Benchmark) {
+  console.log("Benchmark:", benchmark.name);
 
   console.log(
-    "Took:",
-    benchmark.took > SLOW_TIME_TRESHOLD
-      ? chalk.red(formattedTime)
-      : chalk.green(formattedTime),
-    timeDiff > 0 ? chalk.red(timeDiffText) : chalk.green(timeDiffText)
+    "Cold build took:",
+    logBuildDuration(benchmark, compare, "coldTime")
+  );
+  console.log(
+    "Cached build took:",
+    logBuildDuration(benchmark, compare, "hotTime")
   );
 
   console.log("=== Sizes ===");
