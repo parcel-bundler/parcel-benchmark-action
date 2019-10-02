@@ -5,6 +5,8 @@ import getActionInfo from "./action/get-info";
 import gitClone from "./git/clone";
 import gitCheckout from "./git/checkout";
 import yarnInstall from "./yarn/install";
+import benchmark from "./utils/benchmark";
+import logBenchmarks from "./utils/log-benchmarks";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
 
@@ -15,7 +17,8 @@ async function start() {
   let actionInfo = getActionInfo();
 
   // Skip if invalid request...
-  if (actionInfo.skipClone || !ALLOWED_ACTIONS.has(actionInfo.actionName)) return;
+  if (actionInfo.skipClone || !ALLOWED_ACTIONS.has(actionInfo.actionName))
+    return;
 
   let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
   console.log("Cloning Parcel Repository...");
@@ -28,6 +31,14 @@ async function start() {
   await gitClone(actionInfo.prRepo, prDir);
   await gitCheckout(prDir, actionInfo.prRef);
   await yarnInstall(prDir);
+
+  console.log("Benchmarking Base Repo...");
+  let baseBenchmarks = await benchmark(parcelTwoDir);
+
+  console.log("Benchmarking PR Repo...");
+  let prBenchmarks = await benchmark(prDir);
+
+  logBenchmarks({ base: baseBenchmarks, pr: prBenchmarks });
 }
 
 start();

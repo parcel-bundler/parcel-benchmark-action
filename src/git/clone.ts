@@ -5,7 +5,7 @@ import runCommand from "../utils/run-command";
 export default async function clone(url: string, destination: string) {
   let exists = await fs.pathExists(destination);
   if (exists) {
-    throw new Error(
+    return console.warn(
       `Cannot clone into ${destination}, directory already exists`
     );
   }
