@@ -11,7 +11,15 @@ export default async function runCommand(
   command.stderr.pipe(process.stderr);
   command.stdout.pipe(process.stdout);
 
-  await new Promise(r => command.once("close", r));
+  await new Promise((resolve, reject) => {
+    command.once("close", (code) => {
+      if (code !== 0) {
+        return reject(code);
+      }
+
+      resolve(code);
+    })
+  });
 
   return Date.now() - startTime;
 }
