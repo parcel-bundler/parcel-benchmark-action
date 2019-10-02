@@ -9,6 +9,6 @@ WORKDIR /usr/src/app
 COPY ./ ./
 
 RUN yarn install
-RUN yarn build-tsc
+RUN yarn build
 
-CMD [ "node", "./src/index.js" ]
+CMD [ "yarn", "start" ]
