@@ -11,4 +11,4 @@ COPY ./ ./
 RUN yarn install
 RUN yarn build
 
-CMD [ "yarn", "action-start" ]
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
