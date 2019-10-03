@@ -9,18 +9,11 @@ export default function getInfo() {
     GIT_ROOT_DIR,
     GITHUB_ACTION,
     GITHUB_REPOSITORY,
-    GITHUB_EVENT_PATH,
-    BOT_GITHUB_PASSWORD
+    GITHUB_EVENT_PATH
   } = process.env;
 
   if (process.env.GITHUB_TOKEN) {
     delete process.env.GITHUB_TOKEN;
-    delete process.env.BOT_GITHUB_PASSWORD;
-  }
-
-  if (!BOT_GITHUB_PASSWORD) {
-    console.warn("BOT_GITHUB_PASSWORD is undefined");
-    captureException(new Error("BOT_GITHUB_PASSWORD is undefined"));
   }
 
   let info = {
