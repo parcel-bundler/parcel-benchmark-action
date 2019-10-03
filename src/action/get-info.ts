@@ -1,3 +1,5 @@
+import { captureException } from "@sentry/node";
+
 export default function getInfo() {
   const {
     ISSUE_ID,
@@ -16,7 +18,8 @@ export default function getInfo() {
   }
 
   if (!BOT_GITHUB_PASSWORD) {
-    throw new Error("BOT_GITHUB_PASSWORD is undefined");
+    console.warn("BOT_GITHUB_PASSWORD is undefined");
+    captureException(new Error("BOT_GITHUB_PASSWORD is undefined"));
   }
 
   let info = {

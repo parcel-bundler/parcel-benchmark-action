@@ -1,20 +1,17 @@
 import path from "path";
 import * as Sentry from "@sentry/node";
+import fs from "fs-extra";
+import urlJoin from "url-join";
 
 import getActionInfo from "./action/get-info";
-
 import gitClone from "./git/clone";
 import gitCheckout from "./git/checkout";
 import yarnInstall from "./yarn/install";
 import benchmark from "./utils/benchmark";
 import logBenchmarks from "./utils/log-benchmarks";
-import fs from "fs-extra";
-import urlJoin from "url-join";
+import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from "./constants";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
-
-const BASE_REPO = "https://github.com/parcel-bundler/parcel.git";
-const BASE_BRANCH = "v2";
 
 Sentry.init({
   dsn: "https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535"
@@ -30,8 +27,11 @@ async function start() {
 
   let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
   console.log("Cloning Parcel Repository...");
-  await gitClone(BASE_REPO, parcelTwoDir);
-  await gitCheckout(parcelTwoDir, BASE_BRANCH);
+  await gitClone(
+    urlJoin(actionInfo.gitRoot, REPO_OWNER, REPO_NAME),
+    parcelTwoDir
+  );
+  await gitCheckout(parcelTwoDir, REPO_BRANCH);
   console.log("Copying benchmarks...");
   await fs.copy(
     path.join(process.cwd(), "benchmarks"),
