@@ -9,8 +9,9 @@ import gitCheckout from "./git/checkout";
 import yarnInstall from "./yarn/install";
 import benchmark from "./utils/benchmark";
 import compareBenchmarks from "./utils/compare-benchmarks";
-import logComparison from "./utils/log-comparison";
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from "./constants";
+import sendResults from "./utils/send-results";
+import gitLastCommitHash from "./git/last-commit-hash";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
 
@@ -53,6 +54,8 @@ async function start() {
   );
   await yarnInstall(prDir);
 
+  let commitHash = await gitLastCommitHash(prDir);
+
   console.log("Benchmarking Base Repo...");
   let baseBenchmarks = await benchmark(parcelTwoDir);
 
@@ -60,10 +63,12 @@ async function start() {
   let prBenchmarks = await benchmark(prDir);
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
-
-  await logComparison(comparisons, {
-    githubIssue: actionInfo.issueId,
-    githubPassword: actionInfo.githubPassword
+  await sendResults({
+    comparisons,
+    commitHash,
+    repo: actionInfo.prRepo,
+    branch: actionInfo.prRef,
+    issueNumber: actionInfo.issueId
   });
 
   // This ensures Sentry has all errors before we stop the process...

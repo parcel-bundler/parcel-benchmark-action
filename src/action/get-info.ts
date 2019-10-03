@@ -29,8 +29,7 @@ export default function getInfo() {
     gitRoot: GIT_ROOT_DIR || "https://github.com/",
     prRepo: GITHUB_REPOSITORY || `${REPO_OWNER}/${REPO_NAME}`,
     prRef: GITHUB_REF || REPO_BRANCH,
-    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3",
-    githubPassword: BOT_GITHUB_PASSWORD
+    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3"
   };
 
   // get comment

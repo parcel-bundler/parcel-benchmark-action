@@ -68,7 +68,7 @@ export function compareMetrics(
 export default function compareBenchmarks(
   base: Benchmarks,
   comparison: Benchmarks
-) {
+): Comparisons {
   let results: Comparisons = [];
 
   for (let i = 0; i < base.length; i++) {
