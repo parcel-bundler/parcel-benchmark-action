@@ -39,9 +39,9 @@ function formatSizeDiff(sizeDiff: number) {
 }
 
 function logBundles(bundles: Array<BundleComparison>, title: string): string {
-  let res = `#### ${title}\n\n`;
-  res += `| Bundle | Size | Difference | Time | Difference |\n`;
-  res += `| --- | --- | --- | --- | --- |\n`;
+  let renderedBundles = 0;
+  let bundleTable = `| Bundle | Size | Difference | Time | Difference |\n`;
+  bundleTable += `| --- | --- | --- | --- | --- |\n`;
   for (let bundle of bundles) {
     if (
       Math.abs(bundle.timeDiff) < TIMEDIFF_TRESHOLD &&
@@ -50,13 +50,22 @@ function logBundles(bundles: Array<BundleComparison>, title: string): string {
       continue;
     }
 
-    res += `| ${path.basename(bundle.filePath)} | ${sizeFormatter(
+    bundleTable += `| ${path.basename(bundle.filePath)} | ${sizeFormatter(
       bundle.size
     )} | ${formatSizeDiff(bundle.sizeDiff)} | ${timeFormatter(
       bundle.time
     )} | ${formatTimeDiff(bundle.timeDiff)} |\n`;
+
+    renderedBundles++;
   }
 
+  let res = `#### ${title}\n\n`;
+  if (renderedBundles > 0) {
+    res += bundleTable;
+  } else {
+    res += "*No bundle changes detected.*\n";
+  }
+  res += "\n";
   return res;
 }
 
@@ -79,9 +88,7 @@ function logComparison(comparison: Comparison) {
 
   // Bundle Sizes
   res += logBundles(comparison.cold.bundles, "Cold Bundles");
-  res += "\n";
   res += logBundles(comparison.cold.bundles, "Cached Bundles");
-  res += "\n";
 
   res += "</p></details>";
 
