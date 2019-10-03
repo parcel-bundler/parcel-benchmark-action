@@ -1,6 +1,10 @@
 import path from "path";
 
-import { Comparisons, Comparison } from "./compare-benchmarks";
+import {
+  Comparisons,
+  Comparison,
+  BundleComparison
+} from "./compare-benchmarks";
 import postComment from "../github/post-comment";
 import timeFormatter from "./time-formatter";
 import sizeFormatter from "./size-formatter";
@@ -11,6 +15,7 @@ type LoggerOptions = {
 };
 
 const TIMEDIFF_TRESHOLD = 100;
+const SIZEDIFF_TRESHOLD = 1;
 
 function getAddition(diff: number) {
   if (diff > 0) {
@@ -33,6 +38,28 @@ function formatSizeDiff(sizeDiff: number) {
   return prefix + sizeFormatter(Math.abs(sizeDiff)) + addition;
 }
 
+function logBundles(bundles: Array<BundleComparison>, title: string): string {
+  let res = `#### ${title}\n\n`;
+  res += `| Bundle | Size | Difference | Time | Difference |\n`;
+  res += `| --- | --- | --- | --- | --- |\n`;
+  for (let bundle of bundles) {
+    if (
+      Math.abs(bundle.timeDiff) < TIMEDIFF_TRESHOLD &&
+      Math.abs(bundle.sizeDiff) < SIZEDIFF_TRESHOLD
+    ) {
+      continue;
+    }
+
+    res += `| ${path.basename(bundle.filePath)} | ${sizeFormatter(
+      bundle.size
+    )} | ${formatSizeDiff(bundle.sizeDiff)} | ${timeFormatter(
+      bundle.time
+    )} | ${formatTimeDiff(bundle.timeDiff)} |\n`;
+  }
+
+  return res;
+}
+
 function logComparison(comparison: Comparison) {
   let res = "";
 
@@ -51,17 +78,10 @@ function logComparison(comparison: Comparison) {
   res += "\n";
 
   // Bundle Sizes
-  res += `#### Bundles\n\n`;
-  res += `| Bundle | Size | Difference | Time | Difference |\n`;
-  res += `| --- | --- | --- | --- | --- |\n`;
-  for (let bundle of comparison.cold.bundles) {
-    // bundle.sizeDiff
-    res += `| ${path.basename(bundle.filePath)} | ${sizeFormatter(
-      bundle.size
-    )} | ${formatSizeDiff(bundle.sizeDiff)} | ${timeFormatter(
-      bundle.time
-    )} | ${formatTimeDiff(bundle.timeDiff)} |\n`;
-  }
+  res += logBundles(comparison.cold.bundles, "Cold Bundles");
+  res += "\n";
+  res += logBundles(comparison.cold.bundles, "Cached Bundles");
+  res += "\n";
 
   res += "</p></details>";
 
