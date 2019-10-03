@@ -1,6 +1,6 @@
 # Parcel benchmark action
 
-Benchmark API Repo: [DeMoorJasper/parcel-benchmark-api](https://github.com/DeMoorJasper/parcel-benchmark-api)
+Benchmark API Repo: [parcel-bundler/parcel-benchmark-api](https://github.com/parcel-bundler/parcel-benchmark-api)
 
 This is an experimental GitHub Action for testing Parcel's performance and bundle size on a couple demo applications to automatically measure and report performance impact of PRs on these examples.
 
