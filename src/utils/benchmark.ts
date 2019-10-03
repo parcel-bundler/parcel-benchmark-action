@@ -3,18 +3,35 @@ import fs from "fs-extra";
 
 import runCommand from "./run-command";
 import { PARCEL_EXAMPLES } from "../constants";
-import mean from "./mean";
 
 export type SizesObj = { [key: string]: number };
 
 export type Benchmark = {
   name: string;
-  coldTime: number;
-  hotTime: number;
-  size: SizesObj;
+  cold: BuildMetrics;
+  cached: BuildMetrics;
 };
 
 export type Benchmarks = Array<Benchmark>;
+
+export type AssetMetrics = {
+  filePath: string;
+  size: number;
+  time: number;
+};
+
+export type BundleMetrics = {
+  filePath: string;
+  size: number;
+  time: number;
+  largestAssets: Array<AssetMetrics>;
+  totalAssets: number;
+};
+
+export type BuildMetrics = {
+  buildTime: number;
+  bundles: Array<BundleMetrics>;
+};
 
 type BuildOpts = {
   dir: string;
@@ -24,48 +41,19 @@ type BuildOpts = {
 
 const AMOUNT_OF_RUNS = 2;
 
-// Returns total sizes in bytes per filetype
-async function getRecursizeFileSizes(
-  dir: string,
-  sizes: SizesObj = {}
-): Promise<SizesObj> {
-  let stat = await fs.stat(dir);
-  if (stat.isDirectory()) {
-    let dirContent = await fs.readdir(dir);
-
-    for (let item of dirContent) {
-      let absPath = path.join(dir, item);
-      let itemStats = await fs.stat(absPath);
-
-      if (itemStats.isDirectory()) {
-        await getRecursizeFileSizes(absPath, sizes);
-      } else {
-        let ext = path.extname(absPath);
-        if (sizes[ext] === undefined) {
-          sizes[ext] = 0;
-        }
-
-        sizes[ext] += itemStats.size;
-      }
-    }
-  }
-
-  return sizes;
-}
-
-async function getDistSize(distDir: string) {
-  return getRecursizeFileSizes(distDir);
-}
-
 async function runBuild(options: BuildOpts) {
   let args = ["run", "parcel", "build", options.entrypoint];
   if (!options.cache) {
     args.push("--no-cache");
   }
 
-  return runCommand("yarn", args, {
+  await runCommand("yarn", args, {
     cwd: options.dir
   });
+
+  return JSON.parse(
+    await fs.readFile(path.join(options.dir, "parcel-metrics.json"), "utf8")
+  );
 }
 
 async function runParcelExample(
@@ -74,9 +62,9 @@ async function runParcelExample(
 ): Promise<Benchmark> {
   let benchmarkConfig = require(path.join(exampleDir, "benchmark-config.json"));
 
-  let coldBuildtimes = [];
+  let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    coldBuildtimes.push(
+    coldBuildMetrics.push(
       await runBuild({
         dir: exampleDir,
         entrypoint: benchmarkConfig.entrypoint
@@ -84,7 +72,7 @@ async function runParcelExample(
     );
   }
 
-  let cachedBuildtimes = [];
+  let cachedBuildMetrics = [];
   // Create cache...
   await runBuild({
     dir: exampleDir,
@@ -93,7 +81,7 @@ async function runParcelExample(
   });
 
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    cachedBuildtimes.push(
+    cachedBuildMetrics.push(
       await runBuild({
         dir: exampleDir,
         cache: true,
@@ -104,17 +92,49 @@ async function runParcelExample(
 
   return {
     name,
-    coldTime: mean(coldBuildtimes),
-    hotTime: mean(cachedBuildtimes),
-    size: await getDistSize(
-      path.join(exampleDir, benchmarkConfig.outputDir || "dist")
-    )
+    cold: meanBuildMetrics(coldBuildMetrics),
+    cached: meanBuildMetrics(cachedBuildMetrics)
   };
+}
+
+function meanBuildMetrics(metrics: Array<BuildMetrics>): BuildMetrics {
+  let means: any = {
+    buildTime: 0,
+    bundles: []
+  };
+
+  for (let i = 0; i < metrics.length; i++) {
+    let metric = metrics[i];
+    means.buildTime += metric.buildTime;
+
+    if (i !== 0) {
+      for (let y = 0; y < metric.bundles.length; y++) {
+        means.bundles[y].time += metric.bundles[y].time;
+
+        for (let x = 0; x < metric.bundles[y].largestAssets.length; x++) {
+          means.bundles[y].largestAssets[x].time +=
+            metric.bundles[y].largestAssets[x].time;
+        }
+      }
+    } else {
+      means.bundles = metric.bundles;
+    }
+  }
+
+  means.buildTime /= metrics.length;
+  for (let bundle of means.bundles) {
+    bundle.time /= metrics.length;
+    for (let asset of bundle.largestAssets) {
+      asset.time /= metrics.length;
+    }
+  }
+
+  return means;
 }
 
 export default async function benchmark(repoRoot: string): Promise<Benchmarks> {
   return Promise.all(
-    PARCEL_EXAMPLES.map(exampleDir => {
+    PARCEL_EXAMPLES.map(async exampleDir => {
       let fullDir = path.join(repoRoot, exampleDir);
 
       return runParcelExample(fullDir, exampleDir);

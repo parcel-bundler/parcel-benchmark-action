@@ -8,7 +8,8 @@ import gitClone from "./git/clone";
 import gitCheckout from "./git/checkout";
 import yarnInstall from "./yarn/install";
 import benchmark from "./utils/benchmark";
-import logBenchmarks from "./utils/log-benchmarks";
+import compareBenchmarks from "./utils/compare-benchmarks";
+import logComparison from "./utils/log-comparison";
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from "./constants";
 
 const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
@@ -58,13 +59,12 @@ async function start() {
   console.log("Benchmarking PR Repo...");
   let prBenchmarks = await benchmark(prDir);
 
-  await logBenchmarks(
-    { base: baseBenchmarks, pr: prBenchmarks },
-    {
-      githubIssue: actionInfo.issueId,
-      githubPassword: actionInfo.githubPassword
-    }
-  );
+  let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
+
+  await logComparison(comparisons, {
+    githubIssue: actionInfo.issueId,
+    githubPassword: actionInfo.githubPassword
+  });
 
   // This ensures Sentry has all errors before we stop the process...
   await Sentry.flush();
