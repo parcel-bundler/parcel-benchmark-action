@@ -45,20 +45,22 @@ function logComparison(comparison: Comparison) {
   res += `| Cold | ${timeFormatter(
     comparison.cold.buildTime
   )} | ${formatTimeDiff(comparison.cold.buildTimeDiff)} |\n`;
-  res += `| Cached | | ${timeFormatter(
+  res += `| Cached | ${timeFormatter(
     comparison.cached.buildTime
   )} | ${formatTimeDiff(comparison.cached.buildTimeDiff)} |\n`;
   res += "\n";
 
   // Bundle Sizes
-  res += `#### Bundle Sizes\n\n`;
-  res += `| Bundle | Size | Difference |\n`;
-  res += `| --- | --- | --- |\n`;
+  res += `#### Bundles\n\n`;
+  res += `| Bundle | Size | Difference | Time | Difference |\n`;
+  res += `| --- | --- | --- | --- | --- |\n`;
   for (let bundle of comparison.cold.bundles) {
     // bundle.sizeDiff
     res += `| ${path.basename(bundle.filePath)} | ${sizeFormatter(
       bundle.size
-    )} | ${formatSizeDiff(bundle.sizeDiff)} |\n`;
+    )} | ${formatSizeDiff(bundle.sizeDiff)} | ${timeFormatter(
+      bundle.time
+    )} | ${formatTimeDiff(bundle.timeDiff)} |\n`;
   }
 
   res += "</p></details>";
