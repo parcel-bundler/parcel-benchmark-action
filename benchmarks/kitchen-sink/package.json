@@ -4,7 +4,6 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "@parcel/babel-register": "^2.0.0-alpha.1.1",
     "@parcel/config-default": "^2.0.0-alpha.1.1",
     "parcel": "^2.0.0-alpha.1.1"
   },
