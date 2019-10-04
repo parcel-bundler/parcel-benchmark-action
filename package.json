@@ -13,7 +13,7 @@
     "docker-build": "yarn clean && docker build -t parcel/benchmark .",
     "docker-start": "docker run -i -t parcel/benchmark",
     "format": "prettier --write \"./**/*.{ts,js,json,md,mdx}\"",
-    "lint": "eslint \"./**/*.{ts,tsx,js,jsx}\" --fix"
+    "lint": "eslint \"./**/*.{ts,js}\" --fix"
   },
   "husky": {
     "hooks": {
@@ -21,7 +21,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md,mdx,css,scss}": [
+    "*.{ts,js,json,md,mdx}": [
       "prettier --write",
       "git add"
     ]
