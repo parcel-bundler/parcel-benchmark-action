@@ -28,7 +28,7 @@ async function start() {
   }
 
   let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
-  console.log("Cloning Parcel Repository...");
+  console.log(`Cloning ${REPO_OWNER}/${REPO_NAME}...`);
   await gitClone(
     urlJoin(actionInfo.gitRoot, REPO_OWNER, REPO_NAME),
     parcelTwoDir
@@ -43,7 +43,7 @@ async function start() {
   await yarnInstall(parcelTwoDir);
 
   let prDir = path.join(process.cwd(), ".tmp/parcel-pr");
-  console.log("Cloning PR Repository...");
+  console.log(`Cloning ${actionInfo.prRepo}...`);
   await gitClone(urlJoin(actionInfo.gitRoot, actionInfo.prRepo), prDir);
   await gitCheckout(prDir, actionInfo.prRef);
   console.log("Copying benchmarks...");
@@ -65,10 +65,10 @@ async function start() {
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
   await sendResults({
     comparisons,
-    commitHash,
+    commit: commitHash,
     repo: actionInfo.prRepo,
     branch: actionInfo.prRef,
-    issueNumber: actionInfo.issueId
+    issue: actionInfo.issueId
   });
 
   // This ensures Sentry has all errors before we stop the process...

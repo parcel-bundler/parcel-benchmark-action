@@ -7,10 +7,10 @@ import { API_URL } from "../constants";
 
 type Payload = {
   comparisons: Comparisons;
-  commitHash: string;
+  commit: string;
   repo: string;
   branch: string;
-  issueNumber?: string;
+  issue?: string;
 };
 
 const API_KEY = process.env.PARCEL_BENCHMARK_APIKEY || "";
