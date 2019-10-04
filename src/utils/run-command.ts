@@ -1,4 +1,4 @@
-import { spawn, SpawnOptionsWithoutStdio } from "child_process";
+import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 
 export default async function runCommand(
   cmd: string,
@@ -8,9 +8,9 @@ export default async function runCommand(
 ) {
   let command = spawn(cmd, args, options);
 
-  let output = "";
+  let output = '';
   if (returnOutput) {
-    command.stdout.on("data", c => {
+    command.stdout.on('data', c => {
       if (typeof c.toString !== 'undefined') {
         output += c.toString();
       }
@@ -21,7 +21,7 @@ export default async function runCommand(
   command.stdout.pipe(process.stdout);
 
   await new Promise((resolve, reject) => {
-    command.once("close", code => {
+    command.once('close', code => {
       if (code !== 0) {
         return reject(code);
       }

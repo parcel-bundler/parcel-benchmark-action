@@ -1,6 +1,6 @@
-import fs from "fs-extra";
+import fs from 'fs-extra';
 
-import runCommand from "../utils/run-command";
+import runCommand from '../utils/run-command';
 
 export default async function checkout(cwd: string, branch: string) {
   let exists = await fs.pathExists(cwd);
@@ -8,7 +8,7 @@ export default async function checkout(cwd: string, branch: string) {
     throw new Error(`Repository ${cwd} does not exist`);
   }
 
-  return runCommand("git", ["checkout", branch], {
+  return runCommand('git', ['checkout', branch], {
     cwd
   });
 }

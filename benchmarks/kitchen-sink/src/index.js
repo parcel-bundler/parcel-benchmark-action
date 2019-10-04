@@ -6,7 +6,7 @@ import parcel from './parcel.webp';
 
 // new Worker('./worker.js');
 
-import {message} from './message';
+import { message } from './message';
 
 console.log(message);
 

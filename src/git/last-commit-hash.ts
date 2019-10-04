@@ -1,9 +1,9 @@
-import runCommand from "../utils/run-command";
+import runCommand from '../utils/run-command';
 
 export default async function getCommitId(cwd: string): Promise<string> {
   let command = await runCommand(
-    "git",
-    ["rev-parse", "HEAD"],
+    'git',
+    ['rev-parse', 'HEAD'],
     {
       cwd
     },

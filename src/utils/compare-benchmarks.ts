@@ -1,6 +1,6 @@
-import path from "path";
+import path from 'path';
 
-import { Benchmarks, BuildMetrics } from "./benchmark";
+import { Benchmarks, BuildMetrics } from './benchmark';
 
 export type AssetComparison = {
   filePath: string;
@@ -34,11 +34,7 @@ export type Comparison = {
 
 export type Comparisons = Array<Comparison>;
 
-export function compareMetrics(
-  base: BuildMetrics,
-  comparison: BuildMetrics,
-  testDir: string
-): BuildComparison {
+export function compareMetrics(base: BuildMetrics, comparison: BuildMetrics, testDir: string): BuildComparison {
   return {
     buildTime: comparison.buildTime,
     buildTimeDiff: comparison.buildTime - base.buildTime,
@@ -68,10 +64,7 @@ export function compareMetrics(
   };
 }
 
-export default function compareBenchmarks(
-  base: Benchmarks,
-  comparison: Benchmarks
-): Comparisons {
+export default function compareBenchmarks(base: Benchmarks, comparison: Benchmarks): Comparisons {
   let results: Comparisons = [];
 
   for (let i = 0; i < base.length; i++) {
@@ -80,16 +73,8 @@ export default function compareBenchmarks(
 
     results.push({
       name: baseMetrics.name,
-      cold: compareMetrics(
-        baseMetrics.cold,
-        comparisonMetrics.cold,
-        baseMetrics.directory
-      ),
-      cached: compareMetrics(
-        baseMetrics.cached,
-        comparisonMetrics.cached,
-        baseMetrics.directory
-      )
+      cold: compareMetrics(baseMetrics.cold, comparisonMetrics.cold, baseMetrics.directory),
+      cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached, baseMetrics.directory)
     });
   }
 

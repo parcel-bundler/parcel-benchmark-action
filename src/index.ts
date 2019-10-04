@@ -1,22 +1,22 @@
-import path from "path";
-import * as Sentry from "@sentry/node";
-import fs from "fs-extra";
-import urlJoin from "url-join";
+import path from 'path';
+import * as Sentry from '@sentry/node';
+import fs from 'fs-extra';
+import urlJoin from 'url-join';
 
-import getActionInfo from "./action/get-info";
-import gitClone from "./git/clone";
-import gitCheckout from "./git/checkout";
-import yarnInstall from "./yarn/install";
-import benchmark from "./utils/benchmark";
-import compareBenchmarks from "./utils/compare-benchmarks";
-import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from "./constants";
-import sendResults from "./utils/send-results";
-import gitLastCommitHash from "./git/last-commit-hash";
+import getActionInfo from './action/get-info';
+import gitClone from './git/clone';
+import gitCheckout from './git/checkout';
+import yarnInstall from './yarn/install';
+import benchmark from './utils/benchmark';
+import compareBenchmarks from './utils/compare-benchmarks';
+import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from './constants';
+import sendResults from './utils/send-results';
+import gitLastCommitHash from './git/last-commit-hash';
 
-const ALLOWED_ACTIONS = new Set(["synchronize", "opened"]);
+const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
 Sentry.init({
-  dsn: "https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535"
+  dsn: 'https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535'
 });
 
 async function start() {
@@ -27,39 +27,30 @@ async function start() {
     return;
   }
 
-  let parcelTwoDir = path.join(process.cwd(), ".tmp/parcel-v2");
+  let parcelTwoDir = path.join(process.cwd(), '.tmp/parcel-v2');
   console.log(`Cloning ${REPO_OWNER}/${REPO_NAME}...`);
-  await gitClone(
-    urlJoin(actionInfo.gitRoot, REPO_OWNER, REPO_NAME),
-    parcelTwoDir
-  );
+  await gitClone(urlJoin(actionInfo.gitRoot, REPO_OWNER, REPO_NAME), parcelTwoDir);
   await gitCheckout(parcelTwoDir, REPO_BRANCH);
-  console.log("Copying benchmarks...");
-  await fs.copy(
-    path.join(process.cwd(), "benchmarks"),
-    path.join(parcelTwoDir, "packages/benchmarks"),
-    { recursive: true }
-  );
+  console.log('Copying benchmarks...');
+  await fs.copy(path.join(process.cwd(), 'benchmarks'), path.join(parcelTwoDir, 'packages/benchmarks'), {
+    recursive: true
+  });
   await yarnInstall(parcelTwoDir);
 
-  let prDir = path.join(process.cwd(), ".tmp/parcel-pr");
+  let prDir = path.join(process.cwd(), '.tmp/parcel-pr');
   console.log(`Cloning ${actionInfo.prRepo}...`);
   await gitClone(urlJoin(actionInfo.gitRoot, actionInfo.prRepo), prDir);
   await gitCheckout(prDir, actionInfo.prRef);
-  console.log("Copying benchmarks...");
-  await fs.copy(
-    path.join(process.cwd(), "benchmarks"),
-    path.join(prDir, "packages/benchmarks"),
-    { recursive: true }
-  );
+  console.log('Copying benchmarks...');
+  await fs.copy(path.join(process.cwd(), 'benchmarks'), path.join(prDir, 'packages/benchmarks'), { recursive: true });
   await yarnInstall(prDir);
 
   let commitHash = await gitLastCommitHash(prDir);
 
-  console.log("Benchmarking Base Repo...");
+  console.log('Benchmarking Base Repo...');
   let baseBenchmarks = await benchmark(parcelTwoDir);
 
-  console.log("Benchmarking PR Repo...");
+  console.log('Benchmarking PR Repo...');
   let prBenchmarks = await benchmark(prDir);
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);

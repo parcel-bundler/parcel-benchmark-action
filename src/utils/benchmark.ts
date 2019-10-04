@@ -1,8 +1,8 @@
-import path from "path";
-import fs from "fs-extra";
+import path from 'path';
+import fs from 'fs-extra';
 
-import runCommand from "./run-command";
-import { PARCEL_EXAMPLES } from "../constants";
+import runCommand from './run-command';
+import { PARCEL_EXAMPLES } from '../constants';
 
 export type SizesObj = { [key: string]: number };
 
@@ -43,25 +43,20 @@ type BuildOpts = {
 const AMOUNT_OF_RUNS = 2;
 
 async function runBuild(options: BuildOpts) {
-  let args = ["run", "parcel", "build", options.entrypoint];
+  let args = ['run', 'parcel', 'build', options.entrypoint];
   if (!options.cache) {
-    args.push("--no-cache");
+    args.push('--no-cache');
   }
 
-  await runCommand("yarn", args, {
+  await runCommand('yarn', args, {
     cwd: options.dir
   });
 
-  return JSON.parse(
-    await fs.readFile(path.join(options.dir, "parcel-metrics.json"), "utf8")
-  );
+  return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
 }
 
-async function runParcelExample(
-  exampleDir: string,
-  name: string
-): Promise<Benchmark> {
-  let benchmarkConfig = require(path.join(exampleDir, "benchmark-config.json"));
+async function runParcelExample(exampleDir: string, name: string): Promise<Benchmark> {
+  let benchmarkConfig = require(path.join(exampleDir, 'benchmark-config.json'));
 
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
@@ -114,8 +109,7 @@ function meanBuildMetrics(metrics: Array<BuildMetrics>): BuildMetrics {
         means.bundles[y].time += metric.bundles[y].time;
 
         for (let x = 0; x < metric.bundles[y].largestAssets.length; x++) {
-          means.bundles[y].largestAssets[x].time +=
-            metric.bundles[y].largestAssets[x].time;
+          means.bundles[y].largestAssets[x].time += metric.bundles[y].largestAssets[x].time;
         }
       }
     } else {

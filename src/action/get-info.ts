@@ -1,5 +1,4 @@
-import { captureException } from "@sentry/node";
-import { REPO_OWNER, REPO_NAME, REPO_BRANCH } from "../constants";
+import { REPO_OWNER, REPO_NAME, REPO_BRANCH } from '../constants';
 
 export default function getInfo() {
   const {
@@ -18,11 +17,11 @@ export default function getInfo() {
 
   let info = {
     skipClone: SKIP_CLONE || false,
-    actionName: GITHUB_ACTION || "opened",
-    gitRoot: GIT_ROOT_DIR || "https://github.com/",
+    actionName: GITHUB_ACTION || 'opened',
+    gitRoot: GIT_ROOT_DIR || 'https://github.com/',
     prRepo: GITHUB_REPOSITORY || `${REPO_OWNER}/${REPO_NAME}`,
     prRef: GITHUB_REF || REPO_BRANCH,
-    issueId: ISSUE_ID ? ISSUE_ID.toString() : "3"
+    issueId: ISSUE_ID ? ISSUE_ID.toString() : '3'
   };
 
   // get comment
@@ -30,7 +29,7 @@ export default function getInfo() {
     let event = require(GITHUB_EVENT_PATH);
     info.actionName = event.action || info.actionName;
 
-    let prData = event["pull_request"];
+    let prData = event['pull_request'];
     if (prData) {
       info.prRepo = prData.head.repo.full_name;
       info.prRef = prData.head.ref;
