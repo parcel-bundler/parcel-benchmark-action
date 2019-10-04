@@ -40,7 +40,8 @@ type BuildOpts = {
   cache?: boolean;
 };
 
-const AMOUNT_OF_RUNS = 2;
+// TODO: Figure out how much effect this has...
+const AMOUNT_OF_RUNS = 1;
 
 async function runBuild(options: BuildOpts) {
   let args = ['run', 'parcel', 'build', options.entrypoint];
