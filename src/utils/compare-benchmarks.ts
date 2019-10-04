@@ -1,3 +1,5 @@
+import path from "path";
+
 import { Benchmarks, BuildMetrics } from "./benchmark";
 
 export type AssetComparison = {
@@ -34,7 +36,8 @@ export type Comparisons = Array<Comparison>;
 
 export function compareMetrics(
   base: BuildMetrics,
-  comparison: BuildMetrics
+  comparison: BuildMetrics,
+  testDir: string
 ): BuildComparison {
   return {
     buildTime: comparison.buildTime,
@@ -43,7 +46,7 @@ export function compareMetrics(
       let comparisonBundle = comparison.bundles[bundleIndex];
 
       return {
-        filePath: bundle.filePath,
+        filePath: path.relative(testDir, bundle.filePath),
         size: bundle.size,
         sizeDiff: comparisonBundle.size - bundle.size,
         time: comparisonBundle.time,
@@ -52,7 +55,7 @@ export function compareMetrics(
           let comparisonAsset = comparisonBundle.largestAssets[assetIndex];
 
           return {
-            filePath: asset.filePath,
+            filePath: path.relative(testDir, asset.filePath),
             size: asset.size,
             sizeDiff: comparisonAsset.size - asset.size,
             time: comparisonAsset.time,
@@ -77,8 +80,16 @@ export default function compareBenchmarks(
 
     results.push({
       name: baseMetrics.name,
-      cold: compareMetrics(baseMetrics.cold, comparisonMetrics.cold),
-      cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached)
+      cold: compareMetrics(
+        baseMetrics.cold,
+        comparisonMetrics.cold,
+        baseMetrics.directory
+      ),
+      cached: compareMetrics(
+        baseMetrics.cached,
+        comparisonMetrics.cached,
+        baseMetrics.directory
+      )
     });
   }
 

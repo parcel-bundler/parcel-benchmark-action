@@ -8,6 +8,7 @@ export type SizesObj = { [key: string]: number };
 
 export type Benchmark = {
   name: string;
+  directory: string;
   cold: BuildMetrics;
   cached: BuildMetrics;
 };
@@ -92,6 +93,7 @@ async function runParcelExample(
 
   return {
     name,
+    directory: exampleDir,
     cold: meanBuildMetrics(coldBuildMetrics),
     cached: meanBuildMetrics(cachedBuildMetrics)
   };
