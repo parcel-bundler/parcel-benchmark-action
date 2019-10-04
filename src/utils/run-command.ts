@@ -23,7 +23,9 @@ export default async function runCommand(
   await new Promise((resolve, reject) => {
     command.once('close', code => {
       if (code !== 0) {
-        return reject(code);
+        let errorText = `command ${cmd} ${args && args.join(' ')} failed with status code ${code}.`;
+        console.error(errorText);
+        return reject(errorText);
       }
 
       resolve(code);

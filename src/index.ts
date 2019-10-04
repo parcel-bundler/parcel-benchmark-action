@@ -16,7 +16,8 @@ import gitLastCommitHash from './git/last-commit-hash';
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
 Sentry.init({
-  dsn: 'https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535'
+  dsn: 'https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535',
+  debug: process.env.NODE_ENV === 'development'
 });
 
 async function start() {

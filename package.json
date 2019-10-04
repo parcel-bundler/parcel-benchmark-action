@@ -8,7 +8,7 @@
     "clean": "rm -rf .tmp",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "node src/index",
+    "start": "NODE_ENV=development node src/index",
     "action-start": "yarn clean && node src/index",
     "docker-build": "yarn clean && docker build -t parcel/benchmark .",
     "docker-start": "docker run -i -t parcel/benchmark",

@@ -27,24 +27,18 @@ export default async function sendResults(payload: Payload) {
   };
 
   let url = urlJoin(API_URL, 'metrics');
-  try {
-    console.log(`Send metrics to: ${url}`);
 
-    let res = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload)
-    });
+  console.log(`Send metrics to: ${url}`);
 
-    if (!res.ok) {
-      throw new Error('Could not send metrics: ' + res.statusText);
-    }
+  let res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload)
+  });
 
-    console.log(`Metrics have been sent to ${url}`);
-  } catch (e) {
-    // DO NOT LEAK ANY SECRETS HERE!
-    captureException(e);
-
-    console.error('Failed to post to', url);
+  if (!res.ok) {
+    throw new Error('Could not send metrics: ' + res.statusText);
   }
+
+  console.log(`Metrics have been sent to ${url}`);
 }

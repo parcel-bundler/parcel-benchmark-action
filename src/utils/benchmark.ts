@@ -13,7 +13,7 @@ export type Benchmark = {
   cached: BuildMetrics;
 };
 
-export type Benchmarks = Array<Benchmark>;
+export type Benchmarks = Array<Benchmark | null>;
 
 export type AssetMetrics = {
   filePath: string;
@@ -43,30 +43,41 @@ type BuildOpts = {
 // TODO: Figure out how much effect this has...
 const AMOUNT_OF_RUNS = 1;
 
-async function runBuild(options: BuildOpts) {
-  let args = ['run', 'parcel', 'build', options.entrypoint];
-  if (!options.cache) {
-    args.push('--no-cache');
+async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
+  try {
+    let args = ['run', 'parcel', 'build', options.entrypoint];
+    if (!options.cache) {
+      args.push('--no-cache');
+    }
+
+    await runCommand('yarn', args, {
+      cwd: options.dir
+    });
+
+    return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
+  } catch (e) {
+    if (isRetry) {
+      console.log('Failed to run parcel build:', path.join(options.dir, options.entrypoint));
+      return null;
+    }
+
+    return runBuild(options, true);
   }
-
-  await runCommand('yarn', args, {
-    cwd: options.dir
-  });
-
-  return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
 }
 
-async function runParcelExample(exampleDir: string, name: string): Promise<Benchmark> {
+async function runParcelExample(exampleDir: string, name: string): Promise<Benchmark | null> {
   let benchmarkConfig = require(path.join(exampleDir, 'benchmark-config.json'));
 
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    coldBuildMetrics.push(
-      await runBuild({
-        dir: exampleDir,
-        entrypoint: benchmarkConfig.entrypoint
-      })
-    );
+    let metrics = await runBuild({
+      dir: exampleDir,
+      entrypoint: benchmarkConfig.entrypoint
+    });
+
+    if (metrics) {
+      coldBuildMetrics.push(metrics);
+    }
   }
 
   let cachedBuildMetrics = [];
@@ -78,21 +89,27 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
   });
 
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    cachedBuildMetrics.push(
-      await runBuild({
-        dir: exampleDir,
-        cache: true,
-        entrypoint: benchmarkConfig.entrypoint
-      })
-    );
+    let metrics = await runBuild({
+      dir: exampleDir,
+      cache: true,
+      entrypoint: benchmarkConfig.entrypoint
+    });
+
+    if (metrics) {
+      cachedBuildMetrics.push(metrics);
+    }
   }
 
-  return {
-    name,
-    directory: exampleDir,
-    cold: meanBuildMetrics(coldBuildMetrics),
-    cached: meanBuildMetrics(cachedBuildMetrics)
-  };
+  if (coldBuildMetrics.length > 0 && cachedBuildMetrics.length > 0) {
+    return {
+      name,
+      directory: exampleDir,
+      cold: meanBuildMetrics(coldBuildMetrics),
+      cached: meanBuildMetrics(cachedBuildMetrics)
+    };
+  }
+
+  return null;
 }
 
 function meanBuildMetrics(metrics: Array<BuildMetrics>): BuildMetrics {

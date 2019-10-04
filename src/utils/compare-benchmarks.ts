@@ -71,11 +71,13 @@ export default function compareBenchmarks(base: Benchmarks, comparison: Benchmar
     let baseMetrics = base[i];
     let comparisonMetrics = comparison[i];
 
-    results.push({
-      name: baseMetrics.name,
-      cold: compareMetrics(baseMetrics.cold, comparisonMetrics.cold, baseMetrics.directory),
-      cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached, baseMetrics.directory)
-    });
+    if (baseMetrics && comparisonMetrics) {
+      results.push({
+        name: baseMetrics.name,
+        cold: compareMetrics(baseMetrics.cold, comparisonMetrics.cold, baseMetrics.directory),
+        cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached, baseMetrics.directory)
+      });
+    }
   }
 
   return results;
