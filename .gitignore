@@ -6,7 +6,10 @@ node_modules
 *.lock
 *-log
 *-log.json
+*-error
+*-error.log
 .parcel-cache
+dist
 
 # Temporary file...
 secrets.json

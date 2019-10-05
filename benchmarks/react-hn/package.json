@@ -5,6 +5,9 @@
   "author": "Jonny Buchanan",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "build": "parcel build src/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "http://github.com/insin/react-hn.git"
