@@ -43,6 +43,10 @@ type BuildOpts = {
 
 // Best of 3
 const AMOUNT_OF_RUNS = 3;
+const FALLBACK_METRICS = {
+  buildTime: -1,
+  bundles: []
+};
 
 async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
   try {
@@ -101,24 +105,20 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
     }
   }
 
-  if (coldBuildMetrics.length > 0 && cachedBuildMetrics.length > 0) {
-    return {
-      name,
-      directory: exampleDir,
-      cold: bestBuildMetrics(coldBuildMetrics),
-      cached: bestBuildMetrics(cachedBuildMetrics)
-    };
-  }
-
-  return null;
+  return {
+    name,
+    directory: exampleDir,
+    cold: coldBuildMetrics.length > 0 ? bestBuildMetrics(coldBuildMetrics) : { ...FALLBACK_METRICS },
+    cached: cachedBuildMetrics.length > 0 ? bestBuildMetrics(cachedBuildMetrics) : { ...FALLBACK_METRICS }
+  };
 }
 
 export default async function benchmark(repoRoot: string): Promise<Benchmarks> {
-  return Promise.all(
-    PARCEL_EXAMPLES.map(async exampleDir => {
-      let fullDir = path.join(repoRoot, exampleDir);
-
-      return runParcelExample(fullDir, exampleDir);
-    })
-  );
+  let res: Benchmarks = [];
+  // TODO: Maybe use some kind of queue for this, although this is probably fine...
+  for (let example of PARCEL_EXAMPLES) {
+    let fullDir = path.join(repoRoot, example);
+    res.push(await runParcelExample(fullDir, example));
+  }
+  return res;
 }

@@ -56,7 +56,7 @@ async function start() {
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
 
-  console.log(comparisons);
+  console.log(JSON.stringify(comparisons, null, '\t'));
 
   await sendResults({
     comparisons,

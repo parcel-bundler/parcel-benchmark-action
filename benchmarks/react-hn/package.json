@@ -12,30 +12,17 @@
     "type": "git",
     "url": "http://github.com/insin/react-hn.git"
   },
-  "browser": "dist/legacy/index.js",
-  "browserModern": "dist/modern/index.js",
-  "targets": {
-    "browserModern": {
-      "engines": {
-        "browsers": [
-          "last 1 Chrome version"
-        ]
-      }
-    },
-    "browser": {
-      "engines": {
-        "browsers": [
-          "> 0.25%"
-        ]
-      }
-    }
-  },
+  "main": "dist/main/index.js",
+  "module": "dist/module/index.js",
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-react": "^7.0.0",
-    "@babel/preset-stage-0": "^7.0.0",
+    "@babel/plugin-proposal-function-bind": "^7.2.0",
     "@parcel/config-default": "^2.0.0-alpha.1.1",
+    "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
+    "@parcel/transformer-babel": "^2.0.0-alpha.1.1",
+    "core-js": "^3.2.1",
     "parcel": "^2.0.0-alpha.1.1"
   },
   "dependencies": {
