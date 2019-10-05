@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 
 import runCommand from './run-command';
 import { PARCEL_EXAMPLES } from '../constants';
+import { bestBuildMetrics } from './build-metrics-merger';
 
 export type SizesObj = { [key: string]: number };
 
@@ -40,8 +41,8 @@ type BuildOpts = {
   cache?: boolean;
 };
 
-// TODO: Figure out how much effect this has...
-const AMOUNT_OF_RUNS = 1;
+// Best of 3
+const AMOUNT_OF_RUNS = 3;
 
 async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
   try {
@@ -104,46 +105,12 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
     return {
       name,
       directory: exampleDir,
-      cold: meanBuildMetrics(coldBuildMetrics),
-      cached: meanBuildMetrics(cachedBuildMetrics)
+      cold: bestBuildMetrics(coldBuildMetrics),
+      cached: bestBuildMetrics(cachedBuildMetrics)
     };
   }
 
   return null;
-}
-
-function meanBuildMetrics(metrics: Array<BuildMetrics>): BuildMetrics {
-  let means: any = {
-    buildTime: 0,
-    bundles: []
-  };
-
-  for (let i = 0; i < metrics.length; i++) {
-    let metric = metrics[i];
-    means.buildTime += metric.buildTime;
-
-    if (i !== 0) {
-      for (let y = 0; y < metric.bundles.length; y++) {
-        means.bundles[y].time += metric.bundles[y].time;
-
-        for (let x = 0; x < metric.bundles[y].largestAssets.length; x++) {
-          means.bundles[y].largestAssets[x].time += metric.bundles[y].largestAssets[x].time;
-        }
-      }
-    } else {
-      means.bundles = metric.bundles;
-    }
-  }
-
-  means.buildTime /= metrics.length;
-  for (let bundle of means.bundles) {
-    bundle.time /= metrics.length;
-    for (let asset of bundle.largestAssets) {
-      asset.time /= metrics.length;
-    }
-  }
-
-  return means;
 }
 
 export default async function benchmark(repoRoot: string): Promise<Benchmarks> {

@@ -55,6 +55,9 @@ async function start() {
   let prBenchmarks = await benchmark(prDir);
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
+
+  console.log(comparisons);
+
   await sendResults({
     comparisons,
     commit: commitHash,
