@@ -56,7 +56,11 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
     }
 
     await runCommand('yarn', args, {
-      cwd: options.dir
+      cwd: options.dir,
+      env: {
+        ...process.env,
+        NODE_OPTIONS: '--max-old-space-size=4096'
+      }
     });
 
     return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
