@@ -50,7 +50,7 @@ const FALLBACK_METRICS = {
 
 async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
   try {
-    let args = ['run', 'parcel', 'build', options.entrypoint];
+    let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
     if (!options.cache) {
       args.push('--no-cache');
     }
