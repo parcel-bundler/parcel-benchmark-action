@@ -86,13 +86,6 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
   }
 
   let cachedBuildMetrics = [];
-  // Create cache...
-  await runBuild({
-    dir: exampleDir,
-    cache: true,
-    entrypoint: benchmarkConfig.entrypoint
-  });
-
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
     let metrics = await runBuild({
       dir: exampleDir,
