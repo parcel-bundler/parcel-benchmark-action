@@ -56,7 +56,11 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
     }
 
     await runCommand('yarn', args, {
-      cwd: options.dir
+      cwd: options.dir,
+      env: {
+        ...process.env,
+        NODE_OPTIONS: '--max-old-space-size=4096'
+      }
     });
 
     return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
@@ -75,10 +79,14 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
 
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
+    console.log('Running cold build:', name);
+
     let metrics = await runBuild({
       dir: exampleDir,
       entrypoint: benchmarkConfig.entrypoint
     });
+
+    console.log('Finished cold build:', name);
 
     if (metrics) {
       coldBuildMetrics.push(metrics);
@@ -87,11 +95,15 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
 
   let cachedBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
+    console.log('Running cached build:', name);
+
     let metrics = await runBuild({
       dir: exampleDir,
       cache: true,
       entrypoint: benchmarkConfig.entrypoint
     });
+
+    console.log('Finished cached build:', name);
 
     if (metrics) {
       cachedBuildMetrics.push(metrics);

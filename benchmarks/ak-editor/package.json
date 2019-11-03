@@ -1,0 +1,22 @@
+{
+  "name": "@parcel/ak-editor-benchmark",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "@atlaskit/css-reset": "^5.0.2",
+    "@atlaskit/editor-core": "^113.1.6",
+    "@atlaskit/media-core": "^30.0.15",
+    "@babel/core": "^7.6.0",
+    "core-js": "^3.2.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "react-intl": "^2.6.0",
+    "styled-components": "^3.0.0"
+  },
+  "devDependencies": {
+    "@parcel/config-default": "^2.0.0-alpha.1.1",
+    "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
+    "@parcel/transformer-babel": "^2.0.0-alpha.1.1",
+    "parcel": "^2.0.0-alpha.1.1"
+  }
+}
