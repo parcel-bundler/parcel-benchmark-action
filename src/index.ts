@@ -7,11 +7,12 @@ import getActionInfo from './action/get-info';
 import gitClone from './git/clone';
 import gitCheckout from './git/checkout';
 import yarnInstall from './yarn/install';
-import benchmark from './utils/benchmark';
+import { runBenchmark, Benchmarks } from './utils/benchmark';
 import compareBenchmarks from './utils/compare-benchmarks';
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from './constants';
 import sendResults from './utils/send-results';
 import gitLastCommitHash from './git/last-commit-hash';
+import { PARCEL_EXAMPLES } from './constants';
 
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
@@ -48,11 +49,28 @@ async function start() {
 
   let commitHash = await gitLastCommitHash(prDir);
 
-  console.log('Benchmarking Base Repo...');
-  let baseBenchmarks = await benchmark(parcelTwoDir);
+  let baseBenchmarks: Benchmarks = [];
+  let prBenchmarks: Benchmarks = [];
 
-  console.log('Benchmarking PR Repo...');
-  let prBenchmarks = await benchmark(prDir);
+  for (let example of PARCEL_EXAMPLES) {
+    console.log('Benchmarking Base Repo...');
+    try {
+      let fullDir = path.join(parcelTwoDir, example);
+
+      baseBenchmarks.push(await runBenchmark(fullDir, example));
+    } catch (e) {
+      baseBenchmarks.push(null);
+    }
+
+    console.log('Benchmarking PR Repo...');
+    try {
+      let fullDir = path.join(prDir, example);
+
+      prBenchmarks.push(await runBenchmark(fullDir, example));
+    } catch (e) {
+      prBenchmarks.push(null);
+    }
+  }
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
 
