@@ -2,7 +2,6 @@ import path from 'path';
 import fs from 'fs-extra';
 
 import runCommand from './run-command';
-import { PARCEL_EXAMPLES } from '../constants';
 import { bestBuildMetrics } from './build-metrics-merger';
 
 export type SizesObj = { [key: string]: number };
@@ -74,7 +73,7 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
   }
 }
 
-async function runParcelExample(exampleDir: string, name: string): Promise<Benchmark | null> {
+export async function runBenchmark(exampleDir: string, name: string): Promise<Benchmark | null> {
   let benchmarkConfig = require(path.join(exampleDir, 'benchmark-config.json'));
 
   let coldBuildMetrics = [];
@@ -116,14 +115,4 @@ async function runParcelExample(exampleDir: string, name: string): Promise<Bench
     cold: coldBuildMetrics.length > 0 ? bestBuildMetrics(coldBuildMetrics) : { ...FALLBACK_METRICS },
     cached: cachedBuildMetrics.length > 0 ? bestBuildMetrics(cachedBuildMetrics) : { ...FALLBACK_METRICS }
   };
-}
-
-export default async function benchmark(repoRoot: string): Promise<Benchmarks> {
-  let res: Benchmarks = [];
-  // TODO: Maybe use some kind of queue for this, although this is probably fine...
-  for (let example of PARCEL_EXAMPLES) {
-    let fullDir = path.join(repoRoot, example);
-    res.push(await runParcelExample(fullDir, example));
-  }
-  return res;
 }
