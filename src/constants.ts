@@ -1,6 +1,6 @@
 export const PARCEL_EXAMPLES = [
-  // 'packages/benchmarks/kitchen-sink',
-  // 'packages/benchmarks/react-hn',
+  'packages/benchmarks/kitchen-sink',
+  'packages/benchmarks/react-hn',
   'packages/benchmarks/ak-editor'
 ];
 export const REPO_OWNER = 'parcel-bundler';
