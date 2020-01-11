@@ -3,20 +3,23 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "@atlaskit/css-reset": "^5.0.2",
-    "@atlaskit/editor-core": "^113.1.6",
-    "@atlaskit/media-core": "^30.0.15",
-    "@babel/core": "^7.6.0",
-    "core-js": "^3.2.1",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0",
+    "@atlaskit/css-reset": "^5.0.9",
+    "@atlaskit/editor-core": "^116.0.0",
+    "@atlaskit/media-core": "^31.0.2",
+    "@atlaskit/smart-card": "^12.6.2",
+    "prop-types": "^15.5.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "react-intl": "^2.6.0",
-    "styled-components": "^3.0.0"
+    "rxjs": "^5.5.0",
+    "styled-components": "^3.2.6",
+    "url-search-params": "^0.10.0"
   },
   "devDependencies": {
-    "@parcel/config-default": "^2.0.0-alpha.1.1",
-    "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
-    "@parcel/transformer-babel": "^2.0.0-alpha.1.1",
-    "parcel": "^2.0.0-alpha.1.1"
+    "@babel/core": "^7.7.7",
+    "@parcel/config-default": "^2.0.0-alpha.3.1",
+    "@parcel/reporter-build-metrics": "^2.0.0-alpha.3.1",
+    "@parcel/transformer-babel": "^2.0.0-alpha.3.1",
+    "parcel": "^2.0.0-alpha.3.1"
   }
 }
