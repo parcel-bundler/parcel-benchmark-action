@@ -4,22 +4,22 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "parcel build src/index.js"
+    "build": "parcel build src/index.html"
   },
-  "browser": "dist/legacy/index.js",
-  "browserModern": "dist/modern/index.js",
+  "appLegacy": "dist/legacy/index.html",
+  "appModern": "dist/modern/index.html",
   "targets": {
-    "browserModern": {
-      "engines": {
-        "browsers": [
-          "last 1 Chrome version"
-        ]
-      }
-    },
-    "browser": {
+    "appLegacy": {
       "engines": {
         "browsers": [
           "> 0.25%"
+        ]
+      }
+    },
+    "appModern": {
+      "engines": {
+        "browsers": [
+          "last 1 Chrome version"
         ]
       }
     }
