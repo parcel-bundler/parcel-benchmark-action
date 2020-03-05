@@ -12,6 +12,7 @@
     "type": "git",
     "url": "http://github.com/insin/react-hn.git"
   },
+  "source": "src/index.js",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
   "devDependencies": {

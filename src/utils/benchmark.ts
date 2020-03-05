@@ -36,7 +36,6 @@ export type BuildMetrics = {
 
 type BuildOpts = {
   dir: string;
-  entrypoint: string;
   cache?: boolean;
 };
 
@@ -49,7 +48,7 @@ const FALLBACK_METRICS = {
 
 async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
   try {
-    let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
+    let args = ['run', 'parcel', 'build', '.', '--log-level', 'warn'];
     if (!options.cache) {
       args.push('--no-cache');
     }
@@ -65,7 +64,7 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
     return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
   } catch (e) {
     if (isRetry) {
-      console.log('Failed to run parcel build:', path.join(options.dir, options.entrypoint));
+      console.log('Failed to run parcel build:', options.dir);
       return null;
     }
 
@@ -77,15 +76,12 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
 }
 
 export async function runBenchmark(exampleDir: string, name: string): Promise<Benchmark | null> {
-  let benchmarkConfig = require(path.join(exampleDir, 'benchmark-config.json'));
-
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
     console.log('Running cold build:', name);
 
     let metrics = await runBuild({
-      dir: exampleDir,
-      entrypoint: benchmarkConfig.entrypoint
+      dir: exampleDir
     });
 
     console.log('Finished cold build:', name);
@@ -101,8 +97,7 @@ export async function runBenchmark(exampleDir: string, name: string): Promise<Be
 
     let metrics = await runBuild({
       dir: exampleDir,
-      cache: true,
-      entrypoint: benchmarkConfig.entrypoint
+      cache: true
     });
 
     console.log('Finished cached build:', name);

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "parcel build src/index.html"
   },
+  "source": "src/index.html",
   "appLegacy": "dist/legacy/index.html",
   "appModern": "dist/modern/index.html",
   "targets": {

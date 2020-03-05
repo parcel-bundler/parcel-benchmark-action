@@ -1,6 +1,7 @@
 {
   "name": "@parcel/ak-editor-benchmark",
   "version": "1.0.0",
+  "source": "src/index.js",
   "license": "MIT",
   "dependencies": {
     "@atlaskit/css-reset": "^5.0.9",

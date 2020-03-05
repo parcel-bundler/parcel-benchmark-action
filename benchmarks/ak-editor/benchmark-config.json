@@ -1,4 +1,0 @@
-{
-  "entrypoint": "src/index.js",
-  "outputDir": "dist"
-}
