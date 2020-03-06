@@ -13,6 +13,6 @@
     "sourceMap": false,
     "declaration": false
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "benchmarks", "github"],
   "include": ["**/*.ts", "**/*.tsx"]
 }
