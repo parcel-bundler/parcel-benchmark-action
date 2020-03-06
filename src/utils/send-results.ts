@@ -1,6 +1,5 @@
 import fetch from 'node-fetch';
 import urlJoin from 'url-join';
-import { captureException } from '@sentry/node';
 
 import { Comparisons } from './compare-benchmarks';
 import { API_URL } from '../constants';
