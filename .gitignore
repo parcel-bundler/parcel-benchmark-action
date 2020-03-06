@@ -13,3 +13,7 @@ dist
 
 # Temporary file...
 secrets.json
+
+# Large benchmark thingy
+benchmarks/three
+github
