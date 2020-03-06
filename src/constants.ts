@@ -1,4 +1,5 @@
 export const PARCEL_EXAMPLES = [
+  'packages/benchmarks/three',
   'packages/benchmarks/kitchen-sink',
   'packages/benchmarks/react-hn',
   'packages/benchmarks/ak-editor'
