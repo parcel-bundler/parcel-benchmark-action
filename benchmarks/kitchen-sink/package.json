@@ -28,7 +28,6 @@
   "devDependencies": {
     "@parcel/config-default": "^2.0.0-alpha.1.1",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
-    "@parcel/transformer-babel": "^2.0.0-alpha.1.1",
     "parcel": "^2.0.0-alpha.1.1"
   },
   "dependencies": {
