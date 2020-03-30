@@ -1,16 +1,20 @@
 {
   "name": "@parcel/ak-editor-benchmark",
   "version": "1.0.0",
-  "source": "src/index.js",
   "license": "MIT",
+  "source": "src/index.html",
+  "app": "dist/index.html",
+  "targets": {
+    "app": {}
+  },
   "dependencies": {
-    "@atlaskit/css-reset": "^5.0.9",
-    "@atlaskit/editor-core": "^116.0.0",
-    "@atlaskit/media-core": "^31.0.2",
-    "@atlaskit/smart-card": "^12.6.2",
-    "prop-types": "^15.5.4",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
+    "@atlaskit/css-reset": "^5.0.10",
+    "@atlaskit/editor-core": "^120.1.0",
+    "@atlaskit/media-core": "^31.1.0",
+    "@atlaskit/smart-card": "^13.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "react-intl": "^2.6.0",
     "rxjs": "^5.5.0",
     "styled-components": "^3.2.6",
@@ -20,7 +24,6 @@
     "@babel/core": "^7.7.7",
     "@parcel/config-default": "^2.0.0-alpha.3.1",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.3.1",
-    "@parcel/transformer-babel": "^2.0.0-alpha.3.1",
     "parcel": "^2.0.0-alpha.3.1"
   }
 }
