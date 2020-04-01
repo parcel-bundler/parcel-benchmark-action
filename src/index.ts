@@ -55,18 +55,30 @@ async function start() {
   for (let example of PARCEL_EXAMPLES) {
     console.log('Benchmarking Base Repo...');
     try {
-      let fullDir = path.join(parcelTwoDir, example);
+      let fullDir = path.join(parcelTwoDir, example.directory);
 
-      baseBenchmarks.push(await runBenchmark(fullDir, example));
+      baseBenchmarks.push(
+        await runBenchmark({
+          directory: fullDir,
+          entrypoint: example.entrypoint,
+          name: example.name
+        })
+      );
     } catch (e) {
       baseBenchmarks.push(null);
     }
 
     console.log('Benchmarking PR Repo...');
     try {
-      let fullDir = path.join(prDir, example);
+      let fullDir = path.join(prDir, example.directory);
 
-      prBenchmarks.push(await runBenchmark(fullDir, example));
+      prBenchmarks.push(
+        await runBenchmark({
+          directory: fullDir,
+          entrypoint: example.entrypoint,
+          name: example.name
+        })
+      );
     } catch (e) {
       prBenchmarks.push(null);
     }

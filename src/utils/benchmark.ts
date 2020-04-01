@@ -37,6 +37,7 @@ export type BuildMetrics = {
 
 type BuildOpts = {
   dir: string;
+  entrypoint: string;
   cache?: boolean;
 };
 
@@ -47,7 +48,7 @@ const FALLBACK_METRICS = {
 
 async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
   try {
-    let args = ['run', 'parcel', 'build', '.', '--log-level', 'warn'];
+    let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
     if (!options.cache) {
       args.push('--no-cache');
     }
@@ -69,16 +70,25 @@ async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
   }
 }
 
-export async function runBenchmark(exampleDir: string, name: string): Promise<Benchmark | null> {
+export async function runBenchmark({
+  directory,
+  entrypoint,
+  name
+}: {
+  directory: string;
+  entrypoint: string;
+  name: string;
+}): Promise<Benchmark | null> {
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    console.log('Running cold build:', name);
+    console.log('Running cold build:', directory);
 
     let metrics = await runBuild({
-      dir: exampleDir
+      dir: directory,
+      entrypoint
     });
 
-    console.log('Finished cold build:', name);
+    console.log('Finished cold build:', directory);
 
     if (metrics) {
       coldBuildMetrics.push(metrics);
@@ -87,14 +97,15 @@ export async function runBenchmark(exampleDir: string, name: string): Promise<Be
 
   let cachedBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
-    console.log('Running cached build:', name);
+    console.log('Running cached build:', directory);
 
     let metrics = await runBuild({
-      dir: exampleDir,
-      cache: true
+      dir: directory,
+      cache: true,
+      entrypoint
     });
 
-    console.log('Finished cached build:', name);
+    console.log('Finished cached build:', directory);
 
     if (metrics) {
       cachedBuildMetrics.push(metrics);
@@ -103,7 +114,7 @@ export async function runBenchmark(exampleDir: string, name: string): Promise<Be
 
   return {
     name,
-    directory: exampleDir,
+    directory: directory,
     cold: coldBuildMetrics.length > 0 ? bestBuildMetrics(coldBuildMetrics) : { ...FALLBACK_METRICS },
     cached: cachedBuildMetrics.length > 0 ? bestBuildMetrics(cachedBuildMetrics) : { ...FALLBACK_METRICS }
   };
