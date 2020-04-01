@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 
 import runCommand from './run-command';
 import { bestBuildMetrics } from './build-metrics-merger';
+import { AMOUNT_OF_RUNS } from '../constants';
 
 export type SizesObj = { [key: string]: number };
 
@@ -39,14 +40,12 @@ type BuildOpts = {
   cache?: boolean;
 };
 
-// Best of 3
-const AMOUNT_OF_RUNS = 3;
 const FALLBACK_METRICS = {
   buildTime: -1,
   bundles: []
 };
 
-async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<BuildMetrics | null> {
+async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
   try {
     let args = ['run', 'parcel', 'build', '.', '--log-level', 'warn'];
     if (!options.cache) {
@@ -61,16 +60,11 @@ async function runBuild(options: BuildOpts, isRetry: boolean = false): Promise<B
       }
     });
 
-    return JSON.parse(await fs.readFile(path.join(options.dir, 'parcel-metrics.json'), 'utf8'));
+    let metricsPath = path.join(options.dir, 'parcel-metrics.json');
+    let metricsContent = await fs.readFile(metricsPath, 'utf8');
+    return JSON.parse(metricsContent);
   } catch (e) {
-    if (isRetry) {
-      console.log('Failed to run parcel build:', options.dir);
-      return null;
-    }
-
-    // builds should never fail, don't even bother retrying...
-    // return runBuild(options, true);
-
+    console.error(e);
     return null;
   }
 }
