@@ -2,8 +2,6 @@ var IndexRoute = require('react-router/lib/IndexRoute')
 var React = require('react')
 var Route = require('react-router/lib/Route')
 var Item = require('./Item')
-// Polyfill require.ensure
-if (typeof require.ensure !== 'function') require.ensure = function(d, c) { c(require) }
 
 var App = require('./App')
 var Stories = require('./Stories')
@@ -46,26 +44,20 @@ module.exports = <Route path="/" component={App}>
   <Route
     path="comment/:id"
     getComponent={(location, callback) => {
-      require.ensure([], require => {
-        callback(null, require('./PermalinkedComment'))
-      }, 'PermalinkedComment')
+      import('./PermalinkedComment').then(v => callback(null, v.default))
     }}
   />
   <Route path="newcomments" component={Comments}/>
   <Route
     path="user/:id"
     getComponent={(location, callback) => {
-      require.ensure([], require => {
-        callback(null, require('./UserProfile'))
-      }, 'UserProfile')
+      import('./UserProfile').then(v => callback(null, v.default))
     }}
   />
   <Route
     path="*"
     getComponent={(location, callback) => {
-      require.ensure([], require => {
-        callback(null, require('./NotFound'))
-      }, 'NotFound')
+      import('./NotFound').then(v => callback(null, v.default))
     }}
   />
 </Route>
