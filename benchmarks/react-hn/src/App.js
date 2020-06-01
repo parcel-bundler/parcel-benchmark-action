@@ -1,5 +1,6 @@
 var React = require('react')
 var Link = require('react-router/lib/Link')
+var logo = require('url:./assets/img/logo.png')
 
 var Settings = require('./Settings')
 
@@ -52,7 +53,7 @@ var App = React.createClass({
     return <div className="App" onClick={this.state.showSettings && this.toggleSettings}>
       <div className="App__wrap">
         <div className="App__header">
-          <Link to="/news" className="App__homelinkicon"><img src="img/logo.png" width="16" height="16" alt="" /></Link>{' '}
+          <Link to="/news" className="App__homelinkicon"><img src={logo} width="16" height="16" alt="" /></Link>{' '}
           <Link to="/news" activeClassName="active" className="App__homelink">React HN</Link>{' '}
           <Link to="/newest" activeClassName="active">new</Link>{' | '}
           <Link to="/newcomments" activeClassName="active">comments</Link> {' | '}

@@ -6,20 +6,17 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "parcel build src/index.js"
+    "build": "parcel build src/index.html"
   },
   "repository": {
     "type": "git",
     "url": "http://github.com/insin/react-hn.git"
   },
-  "source": "src/index.js",
-  "main": "dist/main/index.js",
-  "module": "dist/module/index.js",
   "devDependencies": {
     "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-function-bind": "^7.2.0",
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-react": "^7.0.0",
-    "@babel/plugin-proposal-function-bind": "^7.2.0",
     "@parcel/config-default": "^2.0.0-alpha.1.1",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
     "core-js": "^3.2.1",
@@ -27,7 +24,7 @@
   },
   "dependencies": {
     "events": "1.1.1",
-    "firebase": "3.4.1",
+    "firebase": "7.14.5",
     "history": "2.1.2",
     "isomorphic-fetch": "2.2.1",
     "react": "15.3.2",
