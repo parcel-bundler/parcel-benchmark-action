@@ -2,15 +2,15 @@ import path from 'path';
 
 import { Benchmarks, BuildMetrics } from './benchmark';
 
-export type AssetComparison = {
+export interface AssetComparison {
   filePath: string;
   size: number;
   sizeDiff: number;
   time: number;
   timeDiff: number;
-};
+}
 
-export type BundleComparison = {
+export interface BundleComparison {
   filePath: string;
   size: number;
   sizeDiff: number;
@@ -18,19 +18,19 @@ export type BundleComparison = {
   timeDiff: number;
   largestAssets: Array<AssetComparison>;
   totalAssets: number;
-};
+}
 
-export type BuildComparison = {
+export interface BuildComparison {
   buildTime: number;
   buildTimeDiff: number;
   bundles: Array<BundleComparison>;
-};
+}
 
-export type Comparison = {
+export interface Comparison {
   name: string;
   cold: BuildComparison;
   cached: BuildComparison;
-};
+}
 
 export type Comparisons = Array<Comparison>;
 

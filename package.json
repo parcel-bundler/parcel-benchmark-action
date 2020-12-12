@@ -45,6 +45,8 @@
     "fs-extra": "^9.0.1",
     "node-fetch": "^2.6.1",
     "p-queue": "^6.6.2",
+    "pretty-bytes": "^5.4.1",
+    "pretty-ms": "^7.0.1",
     "url-join": "^4.0.1"
   }
 }

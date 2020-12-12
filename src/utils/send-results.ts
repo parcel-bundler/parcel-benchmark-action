@@ -4,13 +4,13 @@ import urlJoin from 'url-join';
 import { Comparisons } from './compare-benchmarks';
 import { API_URL } from '../constants';
 
-type Payload = {
+interface Payload {
   comparisons: Comparisons;
   commit: string;
   repo: string;
   branch: string;
   issue?: string;
-};
+}
 
 const API_KEY = process.env.PARCEL_BENCHMARK_APIKEY || '';
 

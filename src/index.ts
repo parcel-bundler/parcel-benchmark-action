@@ -17,6 +17,7 @@ import sendResults from './utils/send-results';
 import gitLastCommitHash from './git/last-commit-hash';
 import BENCHMARKS_CONFIG from '../benchmarks.json';
 import runCommand from './utils/run-command';
+import { printResults } from './utils/print-results';
 
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
@@ -199,7 +200,11 @@ async function start() {
       parcelPackages: mainParcelPackages,
     });
 
-    if (baseBenchmarkResult == null) {
+    if (
+      baseBenchmarkResult == null ||
+      baseBenchmarkResult?.cold?.buildTime < 0 ||
+      baseBenchmarkResult?.cached?.buildTime < 0
+    ) {
       errorCount++;
     }
 
@@ -222,7 +227,7 @@ async function start() {
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
 
-  console.log(JSON.stringify(comparisons, null, '\t'));
+  printResults(comparisons);
 
   await sendResults({
     comparisons,
