@@ -3,7 +3,7 @@ import { BuildMetrics } from './benchmark';
 export function meanBuildMetrics(metrics: Array<BuildMetrics>): BuildMetrics {
   let means: any = {
     buildTime: 0,
-    bundles: []
+    bundles: [],
   };
 
   for (let i = 0; i < metrics.length; i++) {

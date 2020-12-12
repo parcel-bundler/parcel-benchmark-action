@@ -9,6 +9,6 @@ export default async function checkout(cwd: string, branch: string) {
   }
 
   return runCommand('git', ['checkout', branch], {
-    cwd
+    cwd,
   });
 }

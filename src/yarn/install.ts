@@ -9,6 +9,6 @@ export default async function install(cwd: string) {
   }
 
   return runCommand('yarn', ['install'], {
-    cwd
+    cwd,
   });
 }

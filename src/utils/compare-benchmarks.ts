@@ -55,12 +55,12 @@ export function compareMetrics(base: BuildMetrics, comparison: BuildMetrics, tes
             size: asset.size,
             sizeDiff: comparisonAsset.size - asset.size,
             time: comparisonAsset.time,
-            timeDiff: comparisonAsset.time - asset.time
+            timeDiff: comparisonAsset.time - asset.time,
           };
         }),
-        totalAssets: bundle.totalAssets
+        totalAssets: bundle.totalAssets,
       };
-    })
+    }),
   };
 }
 
@@ -75,7 +75,7 @@ export default function compareBenchmarks(base: Benchmarks, comparison: Benchmar
       results.push({
         name: baseMetrics.name,
         cold: compareMetrics(baseMetrics.cold, comparisonMetrics.cold, baseMetrics.directory),
-        cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached, baseMetrics.directory)
+        cached: compareMetrics(baseMetrics.cached, comparisonMetrics.cached, baseMetrics.directory),
       });
     }
   }

@@ -14,6 +14,6 @@ export default async function unlink(cwd: string, pkgName?: string) {
   }
 
   return runCommand('yarn', args, {
-    cwd
+    cwd,
   });
 }

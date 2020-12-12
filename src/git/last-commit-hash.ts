@@ -5,7 +5,7 @@ export default async function getCommitId(cwd: string): Promise<string> {
     'git',
     ['rev-parse', 'HEAD'],
     {
-      cwd
+      cwd,
     },
     true
   );

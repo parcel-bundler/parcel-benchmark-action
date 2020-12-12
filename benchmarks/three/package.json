@@ -1,0 +1,10 @@
+{ 
+  "name": "@parcel/three-js-benchmark",
+  "version": "1.0.0",
+  "source": "./src/Three.js",
+  "license": "MIT",
+  "devDependencies": { 
+    "@parcel/reporter-build-metrics": "^2.0.0-alpha.3.1",
+    "@parcel/config-default": "^2.0.0-alpha.3.1"
+  } 
+}

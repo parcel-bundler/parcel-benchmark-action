@@ -43,7 +43,7 @@ type BuildOpts = {
 
 const FALLBACK_METRICS = {
   buildTime: -1,
-  bundles: []
+  bundles: [],
 };
 
 async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
@@ -57,8 +57,8 @@ async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
       cwd: options.dir,
       env: {
         ...process.env,
-        NODE_OPTIONS: '--max-old-space-size=4096'
-      }
+        NODE_OPTIONS: '--max-old-space-size=4096',
+      },
     });
 
     let metricsPath = path.join(options.dir, 'parcel-metrics.json');
@@ -73,7 +73,7 @@ async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
 export async function runBenchmark({
   directory,
   entrypoint,
-  name
+  name,
 }: {
   directory: string;
   entrypoint: string;
@@ -85,7 +85,7 @@ export async function runBenchmark({
 
     let metrics = await runBuild({
       dir: directory,
-      entrypoint
+      entrypoint,
     });
 
     console.log('Finished cold build:', directory);
@@ -102,7 +102,7 @@ export async function runBenchmark({
     let metrics = await runBuild({
       dir: directory,
       cache: true,
-      entrypoint
+      entrypoint,
     });
 
     console.log('Finished cached build:', directory);
@@ -116,6 +116,6 @@ export async function runBenchmark({
     name,
     directory: directory,
     cold: coldBuildMetrics.length > 0 ? bestBuildMetrics(coldBuildMetrics) : { ...FALLBACK_METRICS },
-    cached: cachedBuildMetrics.length > 0 ? bestBuildMetrics(cachedBuildMetrics) : { ...FALLBACK_METRICS }
+    cached: cachedBuildMetrics.length > 0 ? bestBuildMetrics(cachedBuildMetrics) : { ...FALLBACK_METRICS },
   };
 }

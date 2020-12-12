@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Kitchen Sink",
+    "directory": "kitchen-sink",
+    "entrypoint": "./src/index.html"
+  },
+  {
+    "name": "React HackerNews",
+    "directory": "react-hn",
+    "entrypoint": "./src/index.js"
+  },
+  {
+    "name": "AtlasKit Editor",
+    "directory": "ak-editor",
+    "entrypoint": "./src/index.html"
+  },
+  {
+    "name": "Three.js",
+    "directory": "three",
+    "entrypoint": "./entry.js"
+  }
+]

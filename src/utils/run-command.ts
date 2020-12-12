@@ -10,7 +10,7 @@ export default async function runCommand(
 
   let output = '';
   if (returnOutput) {
-    command.stdout.on('data', c => {
+    command.stdout.on('data', (c) => {
       if (typeof c.toString !== 'undefined') {
         output += c.toString();
       }
@@ -21,7 +21,7 @@ export default async function runCommand(
   command.stdout.pipe(process.stdout);
 
   await new Promise((resolve, reject) => {
-    command.once('close', code => {
+    command.once('close', (code) => {
       if (code !== 0) {
         let errorText = `command ${cmd} ${args && args.join(' ')} failed with status code ${code}.`;
         console.error(errorText);

@@ -22,7 +22,7 @@ export default async function sendResults(payload: Payload) {
 
   let headers = {
     Authorization: API_KEY.trim(),
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
 
   let url = urlJoin(API_URL, 'metrics');
@@ -32,7 +32,7 @@ export default async function sendResults(payload: Payload) {
   let res = await fetch(url, {
     method: 'POST',
     headers,
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
