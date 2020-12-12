@@ -74,10 +74,6 @@ export async function runBenchmark({
   entrypoint: string;
   name: string;
 }): Promise<Benchmark | null> {
-  try {
-  } catch (err) {
-    return null;
-  }
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
     console.log('Running cold build:', directory);
