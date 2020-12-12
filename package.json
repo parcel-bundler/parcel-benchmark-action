@@ -9,8 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "start": "NODE_ENV=development node src/index",
-    "action-start": "yarn clean && node src/index",
-    "docker-build": "yarn clean && docker build -t parcel/benchmark .",
+    "action-start": "node src/index",
+    "docker-build": "docker build -t parcel/benchmark .",
     "docker-start": "docker run -i -t parcel/benchmark",
     "format": "prettier --write \"./**/*.{ts,js,json,md,mdx}\"",
     "lint": "eslint \"./**/*.{ts,js}\" --fix"
