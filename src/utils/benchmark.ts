@@ -47,27 +47,22 @@ const FALLBACK_METRICS = {
 };
 
 async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
-  try {
-    let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
-    if (!options.cache) {
-      args.push('--no-cache');
-    }
-
-    await runCommand('yarn', args, {
-      cwd: options.dir,
-      env: {
-        ...process.env,
-        NODE_OPTIONS: '--max-old-space-size=4096',
-      },
-    });
-
-    let metricsPath = path.join(options.dir, 'parcel-metrics.json');
-    let metricsContent = await fs.readFile(metricsPath, 'utf8');
-    return JSON.parse(metricsContent);
-  } catch (e) {
-    console.error(e);
-    return null;
+  let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
+  if (!options.cache) {
+    args.push('--no-cache');
   }
+
+  await runCommand('yarn', args, {
+    cwd: options.dir,
+    env: {
+      ...process.env,
+      NODE_OPTIONS: '--max-old-space-size=4096',
+    },
+  });
+
+  let metricsPath = path.join(options.dir, 'parcel-metrics.json');
+  let metricsContent = await fs.readFile(metricsPath, 'utf8');
+  return JSON.parse(metricsContent);
 }
 
 export async function runBenchmark({
@@ -79,6 +74,10 @@ export async function runBenchmark({
   entrypoint: string;
   name: string;
 }): Promise<Benchmark | null> {
+  try {
+  } catch (err) {
+    return null;
+  }
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
     console.log('Running cold build:', directory);
