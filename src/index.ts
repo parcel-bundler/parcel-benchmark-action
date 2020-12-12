@@ -10,7 +10,7 @@ import gitCheckout from './git/checkout';
 import yarnInstall from './yarn/install';
 import yarnLink from './yarn/link';
 import yarnUnlink from './yarn/unlink';
-import { runBenchmark, Benchmarks, Benchmark } from './utils/benchmark';
+import { runBenchmark, Benchmarks, IBenchmark, getFailedBenchmarkObject } from './utils/benchmark';
 import compareBenchmarks from './utils/compare-benchmarks';
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from './constants';
 import sendResults from './utils/send-results';
@@ -131,7 +131,7 @@ async function executeBenchmark(opts: {
   };
   parcelPackages: Map<string, string>;
   parcelDir: string;
-}): Promise<Benchmark | null> {
+}): Promise<IBenchmark | null> {
   let { benchmarkConfig, parcelPackages, parcelDir } = opts;
 
   console.log(`Creating a temporary copy of ${benchmarkConfig.name}...`);
@@ -141,20 +141,22 @@ async function executeBenchmark(opts: {
     parcelDir,
   });
 
-  try {
-    let benchmarkResult = await runBenchmark({
-      directory: benchmark.directory,
-      entrypoint: benchmarkConfig.entrypoint,
-      name: benchmarkConfig.name,
-    });
+  let runBenchmarkOptions = {
+    directory: benchmark.directory,
+    entrypoint: benchmarkConfig.entrypoint,
+    name: benchmarkConfig.name,
+  };
 
+  try {
+    let benchmarkResult = await runBenchmark(runBenchmarkOptions);
     return benchmarkResult;
   } catch (err) {
     console.error(err);
-    return null;
-  } finally {
-    await cleanupBenchmark(benchmark);
   }
+
+  await cleanupBenchmark(benchmark);
+
+  return getFailedBenchmarkObject(runBenchmarkOptions);
 }
 
 async function start() {

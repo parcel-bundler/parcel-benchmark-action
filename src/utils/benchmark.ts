@@ -7,14 +7,14 @@ import { AMOUNT_OF_RUNS } from '../constants';
 
 export type SizesObj = { [key: string]: number };
 
-export type Benchmark = {
+export interface IBenchmark {
   name: string;
   directory: string;
   cold: BuildMetrics;
   cached: BuildMetrics;
-};
+}
 
-export type Benchmarks = Array<Benchmark | null>;
+export type Benchmarks = Array<IBenchmark | null>;
 
 export type AssetMetrics = {
   filePath: string;
@@ -65,6 +65,15 @@ async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
   return JSON.parse(metricsContent);
 }
 
+export function getFailedBenchmarkObject({ directory, name }: { directory: string; name: string }): IBenchmark {
+  return {
+    name,
+    directory: directory,
+    cold: { ...FALLBACK_METRICS },
+    cached: { ...FALLBACK_METRICS },
+  };
+}
+
 export async function runBenchmark({
   directory,
   entrypoint,
@@ -73,7 +82,7 @@ export async function runBenchmark({
   directory: string;
   entrypoint: string;
   name: string;
-}): Promise<Benchmark | null> {
+}): Promise<IBenchmark | null> {
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
     console.log('Running cold build:', directory);
