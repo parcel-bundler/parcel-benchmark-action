@@ -1,11 +1,15 @@
 import path from 'path';
 import urlJoin from 'url-join';
 import fs from 'fs-extra';
+import glob from 'fast-glob';
+import PromiseQueue from 'p-queue';
 
 import getActionInfo from './action/get-info';
 import gitClone from './git/clone';
 import gitCheckout from './git/checkout';
 import yarnInstall from './yarn/install';
+import yarnLink from './yarn/link';
+import yarnUnlink from './yarn/unlink';
 import { runBenchmark, Benchmarks } from './utils/benchmark';
 import compareBenchmarks from './utils/compare-benchmarks';
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from './constants';
@@ -30,22 +34,65 @@ async function setupParcel(opts: { repoUrl: string; outputDir: string }): Promis
   console.log(`Building ${repoUrl}...`);
   await runCommand('yarn', ['run', 'build'], { cwd: outputDir });
 
-  return new Map();
+  console.log(`Creating package map of ${repoUrl}...`);
+  let packages = await glob(['packages/**/package.json'], {
+    cwd: outputDir,
+    onlyFiles: true,
+    absolute: true,
+    ignore: ['**/node_modules/**', '**/integration-tests/**', '**/test/**'],
+  });
+
+  let packageMap = new Map();
+  let processingQueue = new PromiseQueue({ concurrency: 10, autoStart: true });
+  for (let pkgFilePath of packages) {
+    processingQueue.add(async () => {
+      let pkgContent = await fs.readFile(pkgFilePath, 'utf-8');
+      let parsedPkgContent = JSON.parse(pkgContent);
+      let pkgName = parsedPkgContent.name;
+      if (pkgName.startsWith('@parcel')) {
+        packageMap.set(parsedPkgContent.name, path.dirname(pkgFilePath));
+      }
+    });
+  }
+  await processingQueue.onIdle();
+
+  return packageMap;
+}
+
+type LinkedPackages = Array<{
+  pkgName: string;
+  directory: string;
+}>;
+
+async function unlinkPackages(packages: LinkedPackages) {
+  for (let pkg of packages) {
+    await yarnUnlink(pkg.directory);
+  }
+}
+
+interface IBenchmarkSetupData {
+  directory: string;
+  linkedPackages: LinkedPackages;
+}
+
+async function cleanupBenchmark(benchmark: IBenchmarkSetupData) {
+  await unlinkPackages(benchmark.linkedPackages);
+  await fs.remove(benchmark.directory);
 }
 
 async function setupBenchmark(opts: {
   benchmarkDir: string;
   parcelPackages: Map<string, string>;
   parcelDir: string;
-}): Promise<string> {
+}): Promise<IBenchmarkSetupData> {
   let { benchmarkDir, parcelPackages, parcelDir } = opts;
 
   // Define directories
-  let fullBenchmarkDir = path.join(process.cwd(), 'benchmarks', benchmarkDir);
+  let sourceBenchmarkDir = path.join(process.cwd(), 'benchmarks', benchmarkDir);
   let tmpBenchmarkDir = path.join(process.cwd(), '.tmp', `${benchmarkDir}-${Date.now()}`);
 
   // Make a temporary benchmark copy
-  await fs.copy(fullBenchmarkDir, tmpBenchmarkDir, { recursive: true });
+  await fs.copy(sourceBenchmarkDir, tmpBenchmarkDir, { recursive: true });
 
   // Install dependencies
   console.log(`Installing dependencies for ${benchmarkDir}...`);
@@ -55,9 +102,25 @@ async function setupBenchmark(opts: {
   let packageJSON = JSON.parse(await fs.readFile(path.join(tmpBenchmarkDir, 'package.json'), 'utf-8'));
   let dependencies = { ...(packageJSON.dependencies || {}), ...(packageJSON.devDependencies || {}) };
   let parcelDependencies = Object.keys(dependencies).filter((p) => p.startsWith('@parcel'));
-  console.log(parcelDependencies);
 
-  return tmpBenchmarkDir;
+  let linkedPackages: Array<{ pkgName: string; directory: string }> = [];
+  for (let parcelDependency of parcelDependencies) {
+    let parcelDependencyDir = parcelPackages.get(parcelDependency);
+    if (parcelDependencyDir) {
+      linkedPackages.push({
+        pkgName: parcelDependency,
+        directory: parcelDependencyDir,
+      });
+
+      await yarnLink(parcelDependencyDir);
+      await yarnLink(tmpBenchmarkDir, parcelDependency);
+    }
+  }
+
+  return {
+    directory: tmpBenchmarkDir,
+    linkedPackages,
+  };
 }
 
 async function start() {
@@ -90,45 +153,57 @@ async function start() {
   // Run Benchmarks
   let baseBenchmarks: Benchmarks = [];
   let prBenchmarks: Benchmarks = [];
+  let errorCount = 0;
   for (let benchmarkConfig of BENCHMARKS_CONFIG) {
     console.log('Benchmarking Base Repo...');
+
+    // Benchmark main branch
+    console.log(`Creating a temporary copy of ${benchmarkConfig.name}...`);
+    let benchmark = await setupBenchmark({
+      benchmarkDir: benchmarkConfig.directory,
+      parcelPackages: mainParcelPackages,
+      parcelDir: mainDir,
+    });
+
     try {
-      console.log(`Creating a temporary copy of ${benchmarkConfig.name}...`);
-      let benchmarkDir = await setupBenchmark({
-        benchmarkDir: benchmarkConfig.directory,
-        parcelPackages: mainParcelPackages,
-        parcelDir: mainDir,
+      let benchmarkResult = await runBenchmark({
+        directory: benchmark.directory,
+        entrypoint: benchmarkConfig.entrypoint,
+        name: benchmarkConfig.name,
       });
 
-      baseBenchmarks.push(
-        await runBenchmark({
-          directory: benchmarkDir,
-          entrypoint: benchmarkConfig.entrypoint,
-          name: benchmarkConfig.name,
-        })
-      );
-    } catch (e) {
+      baseBenchmarks.push(benchmarkResult);
+    } catch (err) {
+      console.error(err);
       baseBenchmarks.push(null);
+      errorCount++;
     }
 
+    await cleanupBenchmark(benchmark);
+
+    // Benchmark Pull Request
     console.log('Benchmarking PR Repo...');
+    benchmark = await setupBenchmark({
+      benchmarkDir: benchmarkConfig.directory,
+      parcelPackages: prParcelPackages,
+      parcelDir: prDir,
+    });
+
     try {
-      let benchmarkDir = await setupBenchmark({
-        benchmarkDir: benchmarkConfig.directory,
-        parcelPackages: prParcelPackages,
-        parcelDir: prDir,
+      let benchmarkResult = await runBenchmark({
+        directory: benchmark.directory,
+        entrypoint: benchmarkConfig.entrypoint,
+        name: benchmarkConfig.name,
       });
 
-      prBenchmarks.push(
-        await runBenchmark({
-          directory: benchmarkDir,
-          entrypoint: benchmarkConfig.entrypoint,
-          name: benchmarkConfig.name,
-        })
-      );
-    } catch (e) {
+      prBenchmarks.push(benchmarkResult);
+    } catch (err) {
+      console.error(err);
       prBenchmarks.push(null);
+      errorCount++;
     }
+
+    await cleanupBenchmark(benchmark);
   }
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
@@ -142,6 +217,12 @@ async function start() {
     branch: actionInfo.prRef,
     issue: actionInfo.issueId,
   });
+
+  if (errorCount > 0) {
+    console.log('Some benchmarks failed to run...');
+    console.log('Total amount of failed benchmarks:', errorCount);
+    process.exit(1);
+  }
 }
 
 start().catch((err) => {
