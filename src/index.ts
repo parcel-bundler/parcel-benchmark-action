@@ -67,6 +67,7 @@ type LinkedPackages = Array<{
 
 async function unlinkPackages(packages: LinkedPackages) {
   for (let pkg of packages) {
+    console.log('Unlinking package', pkg.pkgName);
     await yarnUnlink(pkg.directory);
   }
 }
@@ -77,6 +78,7 @@ interface IBenchmarkSetupData {
 }
 
 async function cleanupBenchmark(benchmark: IBenchmarkSetupData) {
+  console.log('Cleanup benchmark environment');
   await unlinkPackages(benchmark.linkedPackages);
   await fs.remove(benchmark.directory);
 }
@@ -148,16 +150,20 @@ async function executeBenchmark(opts: {
     name: benchmarkConfig.name,
   };
 
+  let benchmarkResult;
   try {
-    let benchmarkResult = await runBenchmark(runBenchmarkOptions);
-    return benchmarkResult;
+    benchmarkResult = await runBenchmark(runBenchmarkOptions);
   } catch (err) {
     console.error(err);
   }
 
   await cleanupBenchmark(benchmark);
 
-  return getFailedBenchmarkObject(runBenchmarkOptions);
+  if (benchmarkResult) {
+    return benchmarkResult;
+  } else {
+    return getFailedBenchmarkObject(runBenchmarkOptions);
+  }
 }
 
 async function start() {
