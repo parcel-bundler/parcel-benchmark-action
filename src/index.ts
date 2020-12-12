@@ -10,7 +10,7 @@ import gitCheckout from './git/checkout';
 import yarnInstall from './yarn/install';
 import yarnLink from './yarn/link';
 import yarnUnlink from './yarn/unlink';
-import { runBenchmark, Benchmarks } from './utils/benchmark';
+import { runBenchmark, Benchmarks, Benchmark } from './utils/benchmark';
 import compareBenchmarks from './utils/compare-benchmarks';
 import { REPO_NAME, REPO_BRANCH, REPO_OWNER } from './constants';
 import sendResults from './utils/send-results';
@@ -123,6 +123,40 @@ async function setupBenchmark(opts: {
   };
 }
 
+async function executeBenchmark(opts: {
+  benchmarkConfig: {
+    name: string;
+    entrypoint: string;
+    directory: string;
+  };
+  parcelPackages: Map<string, string>;
+  parcelDir: string;
+}): Promise<Benchmark | null> {
+  let { benchmarkConfig, parcelPackages, parcelDir } = opts;
+
+  console.log(`Creating a temporary copy of ${benchmarkConfig.name}...`);
+  let benchmark = await setupBenchmark({
+    benchmarkDir: benchmarkConfig.directory,
+    parcelPackages,
+    parcelDir,
+  });
+
+  try {
+    let benchmarkResult = await runBenchmark({
+      directory: benchmark.directory,
+      entrypoint: benchmarkConfig.entrypoint,
+      name: benchmarkConfig.name,
+    });
+
+    return benchmarkResult;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    await cleanupBenchmark(benchmark);
+  }
+}
+
 async function start() {
   let actionInfo = getActionInfo();
 
@@ -155,55 +189,33 @@ async function start() {
   let prBenchmarks: Benchmarks = [];
   let errorCount = 0;
   for (let benchmarkConfig of BENCHMARKS_CONFIG) {
-    console.log('Benchmarking Base Repo...');
-
     // Benchmark main branch
-    console.log(`Creating a temporary copy of ${benchmarkConfig.name}...`);
-    let benchmark = await setupBenchmark({
-      benchmarkDir: benchmarkConfig.directory,
-      parcelPackages: mainParcelPackages,
+    console.log(`Running ${benchmarkConfig.name} on main branch...`);
+    let baseBenchmarkResult = await executeBenchmark({
+      benchmarkConfig,
       parcelDir: mainDir,
+      parcelPackages: mainParcelPackages,
     });
 
-    try {
-      let benchmarkResult = await runBenchmark({
-        directory: benchmark.directory,
-        entrypoint: benchmarkConfig.entrypoint,
-        name: benchmarkConfig.name,
-      });
-
-      baseBenchmarks.push(benchmarkResult);
-    } catch (err) {
-      console.error(err);
-      baseBenchmarks.push(null);
+    if (baseBenchmarkResult == null) {
       errorCount++;
     }
 
-    await cleanupBenchmark(benchmark);
+    baseBenchmarks.push(baseBenchmarkResult);
 
     // Benchmark Pull Request
-    console.log('Benchmarking PR Repo...');
-    benchmark = await setupBenchmark({
-      benchmarkDir: benchmarkConfig.directory,
-      parcelPackages: prParcelPackages,
+    console.log(`Running ${benchmarkConfig.name} on Pull Request...`);
+    let prBenchmarkResult = await executeBenchmark({
+      benchmarkConfig,
       parcelDir: prDir,
+      parcelPackages: prParcelPackages,
     });
 
-    try {
-      let benchmarkResult = await runBenchmark({
-        directory: benchmark.directory,
-        entrypoint: benchmarkConfig.entrypoint,
-        name: benchmarkConfig.name,
-      });
-
-      prBenchmarks.push(benchmarkResult);
-    } catch (err) {
-      console.error(err);
-      prBenchmarks.push(null);
+    if (prBenchmarkResult == null) {
       errorCount++;
     }
 
-    await cleanupBenchmark(benchmark);
+    prBenchmarks.push(prBenchmarkResult);
   }
 
   let comparisons = compareBenchmarks(baseBenchmarks, prBenchmarks);
