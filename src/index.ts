@@ -1,5 +1,4 @@
 import path from 'path';
-import * as Sentry from '@sentry/node';
 import fs from 'fs-extra';
 import urlJoin from 'url-join';
 
@@ -16,11 +15,6 @@ import { PARCEL_EXAMPLES } from './constants';
 
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
-Sentry.init({
-  dsn: 'https://a190bf5fb06045a29e1184a0c4e07b78@sentry.io/1768535',
-  debug: process.env.NODE_ENV === 'development'
-});
-
 async function start() {
   let actionInfo = getActionInfo();
 
@@ -35,7 +29,7 @@ async function start() {
   await gitCheckout(parcelTwoDir, REPO_BRANCH);
   console.log('Copying benchmarks...');
   await fs.copy(path.join(process.cwd(), 'benchmarks'), path.join(parcelTwoDir, 'packages/benchmarks'), {
-    recursive: true
+    recursive: true,
   });
   await yarnInstall(parcelTwoDir);
 
@@ -61,7 +55,7 @@ async function start() {
         await runBenchmark({
           directory: fullDir,
           entrypoint: example.entrypoint,
-          name: example.name
+          name: example.name,
         })
       );
     } catch (e) {
@@ -76,7 +70,7 @@ async function start() {
         await runBenchmark({
           directory: fullDir,
           entrypoint: example.entrypoint,
-          name: example.name
+          name: example.name,
         })
       );
     } catch (e) {
@@ -93,11 +87,11 @@ async function start() {
     commit: commitHash,
     repo: actionInfo.prRepo,
     branch: actionInfo.prRef,
-    issue: actionInfo.issueId
+    issue: actionInfo.issueId,
   });
-
-  // This ensures Sentry has all errors before we stop the process...
-  await Sentry.flush();
 }
 
-start();
+start().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
