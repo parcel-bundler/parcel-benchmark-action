@@ -50,7 +50,7 @@ async function setupParcel(opts: { repoUrl: string; outputDir: string }): Promis
       let pkgContent = await fs.readFile(pkgFilePath, 'utf-8');
       let parsedPkgContent = JSON.parse(pkgContent);
       let pkgName = parsedPkgContent.name;
-      if (pkgName.startsWith('@parcel')) {
+      if (pkgName === 'parcel' || pkgName.startsWith('@parcel')) {
         packageMap.set(parsedPkgContent.name, path.dirname(pkgFilePath));
       }
     });
@@ -102,7 +102,7 @@ async function setupBenchmark(opts: {
   // Link parcel packages
   let packageJSON = JSON.parse(await fs.readFile(path.join(tmpBenchmarkDir, 'package.json'), 'utf-8'));
   let dependencies = { ...(packageJSON.dependencies || {}), ...(packageJSON.devDependencies || {}) };
-  let parcelDependencies = Object.keys(dependencies).filter((p) => p.startsWith('@parcel'));
+  let parcelDependencies = [...Object.keys(dependencies).filter((p) => p.startsWith('@parcel')), 'parcel'];
 
   let linkedPackages: Array<{ pkgName: string; directory: string }> = [];
   for (let parcelDependency of parcelDependencies) {

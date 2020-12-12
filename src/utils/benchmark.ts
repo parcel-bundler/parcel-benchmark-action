@@ -47,12 +47,13 @@ const FALLBACK_METRICS = {
 };
 
 async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
-  let args = ['run', 'parcel', 'build', options.entrypoint, '--log-level', 'warn'];
+  let args = ['build', options.entrypoint, '--log-level', 'warn'];
   if (!options.cache) {
     args.push('--no-cache');
   }
 
-  await runCommand('yarn', args, {
+  // node_modules/parcel/lib/bin.js
+  await runCommand('node_modules/.bin/parcel', args, {
     cwd: options.dir,
     env: {
       ...process.env,
