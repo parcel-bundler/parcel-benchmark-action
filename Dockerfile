@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 
 COPY ./ ./
 
-RUN make benchmarks/three
+RUN make benchmarks/three/src
 RUN yarn install
 RUN yarn build
 
