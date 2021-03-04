@@ -47,7 +47,7 @@ const FALLBACK_METRICS = {
 };
 
 async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
-  let args = ['build', options.entrypoint, '--log-level', 'warn'];
+  let args = ['build', options.entrypoint, '--log-level', 'warn', '--reporter', '@parcel/reporter-build-metrics'];
   if (!options.cache) {
     args.push('--no-cache');
   }

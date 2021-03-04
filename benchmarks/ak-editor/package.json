@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
-    "@parcel/config-default": "^2.0.0-alpha.3.1",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.3.1",
     "parcel": "^2.0.0-alpha.3.1"
   }
