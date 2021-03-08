@@ -88,7 +88,7 @@ async function setupBenchmark(opts: {
   parcelPackages: Map<string, string>;
   parcelDir: string;
 }): Promise<IBenchmarkSetupData> {
-  let { benchmarkDir, parcelPackages, parcelDir } = opts;
+  let { benchmarkDir, parcelPackages } = opts;
 
   // Define directories
   let sourceBenchmarkDir = path.join(process.cwd(), 'benchmarks', benchmarkDir);
@@ -104,7 +104,11 @@ async function setupBenchmark(opts: {
   // Link parcel packages
   let packageJSON = JSON.parse(await fs.readFile(path.join(tmpBenchmarkDir, 'package.json'), 'utf-8'));
   let dependencies = { ...(packageJSON.dependencies || {}), ...(packageJSON.devDependencies || {}) };
-  let parcelDependencies = [...Object.keys(dependencies).filter((p) => p.startsWith('@parcel')), 'parcel'];
+  let parcelDependencies = [
+    ...Object.keys(dependencies).filter((p) => p.startsWith('@parcel')),
+    'parcel',
+    '@parcel/config-default',
+  ];
 
   let linkedPackages: Array<{ pkgName: string; directory: string }> = [];
   for (let parcelDependency of parcelDependencies) {

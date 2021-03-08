@@ -21,7 +21,7 @@
     "url-search-params": "^0.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
+    "@babel/core": "^7.13.8",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.3.1",
     "parcel": "^2.0.0-alpha.3.1"
   }
