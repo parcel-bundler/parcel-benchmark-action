@@ -13,12 +13,13 @@
     "url": "http://github.com/insin/react-hn.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/plugin-proposal-function-bind": "^7.2.0",
-    "@babel/preset-env": "^7.6.2",
-    "@babel/preset-react": "^7.0.0",
+    "@babel/core": "^7.13.8",
+    "@babel/plugin-proposal-function-bind": "^7.12.13",
+    "@babel/preset-env": "^7.13.9",
+    "@babel/preset-react": "^7.12.13",
     "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
-    "core-js": "^3.2.1",
+    "@parcel/transformer-image": "^2.0.0-alpha.1.1",
+    "core-js": "^3.9.1",
     "parcel": "^2.0.0-alpha.1.1"
   },
   "dependencies": {
