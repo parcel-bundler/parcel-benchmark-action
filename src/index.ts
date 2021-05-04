@@ -21,13 +21,13 @@ import { printResults } from './utils/print-results';
 
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
-async function setupParcel(opts: { repoUrl: string; outputDir: string }): Promise<Map<string, string>> {
-  let { repoUrl, outputDir } = opts;
+async function setupParcel(opts: { repoUrl: string; branch: string; outputDir: string }): Promise<Map<string, string>> {
+  let { repoUrl, branch, outputDir } = opts;
 
   // Setup main copy
   console.log(`Cloning ${repoUrl}...`);
   await gitClone(repoUrl, outputDir);
-  await gitCheckout(outputDir, REPO_BRANCH);
+  await gitCheckout(outputDir, branch);
 
   console.log(`Installing ${repoUrl}...`);
   await yarnInstall(outputDir);
@@ -184,6 +184,7 @@ async function start() {
   let mainParcelPackages = await setupParcel({
     outputDir: mainDir,
     repoUrl: urlJoin(actionInfo.gitRoot, REPO_OWNER, REPO_NAME),
+    branch: REPO_BRANCH,
   });
 
   // Setup PR copy
@@ -192,6 +193,7 @@ async function start() {
   let prParcelPackages = await setupParcel({
     outputDir: prDir,
     repoUrl: urlJoin(actionInfo.gitRoot, actionInfo.prRepo),
+    branch: actionInfo.prRef,
   });
 
   // Get commitHash to reference in web interface
