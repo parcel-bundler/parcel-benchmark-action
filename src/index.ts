@@ -32,6 +32,13 @@ async function setupParcel(opts: { repoUrl: string; branch: string; outputDir: s
   console.log(`Installing ${repoUrl}...`);
   await yarnInstall(outputDir);
 
+  try {
+    console.log(`Building native modules ${repoUrl}...`);
+    await runCommand('yarn', ['run', 'build-native-release'], { cwd: outputDir });
+  } catch (e) {
+    console.warn(`Building native modules failed: ${e.message}`);
+  }
+
   console.log(`Building ${repoUrl}...`);
   await runCommand('yarn', ['run', 'build'], { cwd: outputDir });
 
