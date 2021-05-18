@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash -l
 
 set -eu # stop on error
 cd /usr/src/app/
