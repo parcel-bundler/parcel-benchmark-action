@@ -1,0 +1,17 @@
+diff --git a/node_modules/@atlaskit/css-reset/dist/bundle.css b/node_modules/@atlaskit/css-reset/dist/bundle.css
+index b10d736..59c65a3 100644
+--- a/node_modules/@atlaskit/css-reset/dist/bundle.css
++++ b/node_modules/@atlaskit/css-reset/dist/bundle.css
+@@ -165,9 +165,9 @@
+   dl {
+     padding-left: 40px;
+   }
+-  [dir='rtl']ul,
+-  [dir='rtl']ol,
+-  [dir='rtl']dl {
++  [dir='rtl'] ul,
++  [dir='rtl'] ol,
++  [dir='rtl'] dl {
+     padding-left: 0;
+     padding-right: 40px;
+   }
