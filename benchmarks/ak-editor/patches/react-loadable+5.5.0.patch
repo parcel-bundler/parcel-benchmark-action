@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-loadable/lib/index.js b/node_modules/react-loadable/lib/index.js
+index 75b1364..103f56c 100644
+--- a/node_modules/react-loadable/lib/index.js
++++ b/node_modules/react-loadable/lib/index.js
+@@ -90,7 +90,7 @@ function loadMap(obj) {
+ }
+ 
+ function resolve(obj) {
+-  return obj && obj.__esModule ? obj.default : obj;
++  return obj && obj.default ? obj.default : obj;
+ }
+ 
+ function render(loaded, props) {
