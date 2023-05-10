@@ -1,4 +1,4 @@
-FROM node:14.18.0
+FROM node:18.15.0
 
 LABEL com.github.actions.name="Parcel Benchmark Action"
 LABEL com.github.actions.description="Measures performance impact of a PR"
@@ -11,7 +11,7 @@ RUN apt-get update && \
     autoconf automake autotools-dev libtool xutils-dev && \
     rm -rf /var/lib/apt/lists/*
 
-ENV SSL_VERSION=1.0.2k
+ENV SSL_VERSION=1.1.1t
 
 RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
     tar -xzf openssl-$SSL_VERSION.tar.gz && \
