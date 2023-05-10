@@ -1,4 +1,4 @@
-FROM node:14.18.0
+FROM node:14.21.3-bullseye
 
 LABEL com.github.actions.name="Parcel Benchmark Action"
 LABEL com.github.actions.description="Measures performance impact of a PR"
