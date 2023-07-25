@@ -57,7 +57,7 @@ async function setupParcel(opts: { repoUrl: string; branch: string; outputDir: s
       let pkgContent = await fs.readFile(pkgFilePath, 'utf-8');
       let parsedPkgContent = JSON.parse(pkgContent);
       let pkgName = parsedPkgContent.name;
-      if (pkgName === 'parcel' || pkgName.startsWith('@parcel')) {
+      if (pkgName && (pkgName === 'parcel' || pkgName.startsWith('@parcel'))) {
         packageMap.set(parsedPkgContent.name, path.dirname(pkgFilePath));
       }
     });
