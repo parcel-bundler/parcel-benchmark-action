@@ -1,6 +1,6 @@
 {
   "name": "@parcel/kitchen-sink-benchmark",
-  "version": "2.0.0-alpha.1.1",
+  "version": "2.9.3",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -26,9 +26,9 @@
     }
   },
   "devDependencies": {
-    "@parcel/reporter-build-metrics": "^2.0.0-alpha.1.1",
-    "@parcel/transformer-image": "^2.0.0-alpha.1.1",
-    "parcel": "^2.0.0-alpha.1.1"
+    "@parcel/reporter-build-metrics": "^2.9.3",
+    "@parcel/transformer-image": "^2.9.3",
+    "parcel": "^2.9.3"
   },
   "dependencies": {
     "lodash": "^4.17.11",
