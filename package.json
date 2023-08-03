@@ -8,7 +8,7 @@
     "clean": "rm -rf .tmp .parcel-cache github node_modules yarn.lock",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "NODE_ENV=development node src/index",
+    "start": "NODE_ENV=development ts-node src/index",
     "action-start": "ts-node src/index",
     "docker-build": "docker build -t parcel/benchmark .",
     "docker-start": "docker run -i -t parcel/benchmark",
