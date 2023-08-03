@@ -35,7 +35,7 @@ export interface Comparison {
 export type Comparisons = Array<Comparison>;
 
 export function compareMetrics(base: BuildMetrics, comparison: BuildMetrics, testDir: string): BuildComparison {
-  if (process.env.ACTIONS_STEP_DEBUG === 'true') {
+  if (process.env.RUNNER_DEBUG) {
     console.log('\nBase metrics:');
     console.log(JSON.stringify(base, null, 2));
     console.log('\nComparison metrics:');
