@@ -20,24 +20,26 @@ export default async function sendResults(payload: Payload) {
     return;
   }
 
-  let headers = {
-    Authorization: API_KEY.trim(),
-    'Content-Type': 'application/json',
-  };
+  return;
+  
+  // let headers = {
+  //   Authorization: API_KEY.trim(),
+  //   'Content-Type': 'application/json',
+  // };
 
-  let url = urlJoin(API_URL, 'metrics');
+  // let url = urlJoin(API_URL, 'metrics');
 
-  console.log(`Send metrics to: ${url}`);
+  // console.log(`Send metrics to: ${url}`);
 
-  let res = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
-  });
+  // let res = await fetch(url, {
+  //   method: 'POST',
+  //   headers,
+  //   body: JSON.stringify(payload),
+  // });
 
-  if (!res.ok) {
-    throw new Error('Could not send metrics: ' + res.statusText);
-  }
+  // if (!res.ok) {
+  //   throw new Error('Could not send metrics: ' + res.statusText);
+  // }
 
-  console.log(`Metrics have been sent to ${url}`);
+  // console.log(`Metrics have been sent to ${url}`);
 }
