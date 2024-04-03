@@ -36,9 +36,11 @@ export type BuildMetrics = {
 };
 
 type BuildOpts = {
+  trace: boolean;
   dir: string;
   entrypoint: string;
   cache?: boolean;
+  profile?: boolean;
 };
 
 const FALLBACK_METRICS = {
@@ -50,6 +52,12 @@ async function runBuild(options: BuildOpts): Promise<BuildMetrics | null> {
   let args = ['build', options.entrypoint, '--log-level', 'warn', '--reporter', '@parcel/reporter-build-metrics'];
   if (!options.cache) {
     args.push('--no-cache');
+  }
+  if (options.trace) {
+    args.push('--trace');
+  }
+  if (options.profile) {
+    args.push('--profile');
   }
 
   // node_modules/parcel/lib/bin.js
@@ -79,10 +87,14 @@ export async function runBenchmark({
   directory,
   entrypoint,
   name,
+  trace,
+  profile,
 }: {
   directory: string;
   entrypoint: string;
   name: string;
+  profile?: boolean;
+  trace?: boolean;
 }): Promise<IBenchmark | null> {
   let coldBuildMetrics = [];
   for (let i = 0; i < AMOUNT_OF_RUNS; i++) {
@@ -91,6 +103,8 @@ export async function runBenchmark({
     let metrics = await runBuild({
       dir: directory,
       entrypoint,
+      profile,
+      trace: Boolean(trace),
     });
 
     console.log('Finished cold build:', directory);
@@ -108,6 +122,8 @@ export async function runBenchmark({
       dir: directory,
       cache: true,
       entrypoint,
+      profile,
+      trace: Boolean(trace),
     });
 
     console.log('Finished cached build:', directory);

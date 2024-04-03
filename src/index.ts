@@ -150,6 +150,8 @@ async function executeBenchmark(opts: {
   };
   parcelPackages: Map<string, string>;
   parcelDir: string;
+  trace?: boolean;
+  profile?: boolean;
 }): Promise<IBenchmark | null> {
   let { benchmarkConfig, parcelPackages, parcelDir } = opts;
 
@@ -164,6 +166,8 @@ async function executeBenchmark(opts: {
     directory: benchmark.directory,
     entrypoint: benchmarkConfig.entrypoint,
     name: benchmarkConfig.name,
+    trace: opts.trace,
+    profile: opts.profile,
   };
 
   let benchmarkResult;
@@ -171,9 +175,12 @@ async function executeBenchmark(opts: {
     benchmarkResult = await runBenchmark(runBenchmarkOptions);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 
-  await cleanupBenchmark(benchmark);
+  if (!opts.trace && !opts.profile) {
+    await cleanupBenchmark(benchmark);
+  }
 
   if (benchmarkResult) {
     return benchmarkResult;
@@ -280,16 +287,24 @@ function runCommandLine() {
           '--target-dir <TARGET_DIR>',
           'Target directory to run benchmarks against. This should be a parcel checkout'
         )
-        .action(async (args: { targetDir: string }) => {
+        .option('--benchmark [BENCHMARK]', 'Benchmark to run')
+        .option('--trace', 'Trace the builds')
+        .option('--profile', 'Profile the builds')
+        .action(async (args: { targetDir: string; benchmark: string; trace: boolean; profile: boolean }) => {
           try {
             const parcelPackages = await installAndBuildParcel(args.targetDir);
 
             const results = [];
             for (let benchmarkConfig of BENCHMARKS_CONFIG) {
+              if (args.benchmark && !benchmarkConfig.name.includes(args.benchmark)) {
+                continue;
+              }
               const benchmarkResults = await executeBenchmark({
                 benchmarkConfig,
                 parcelDir: args.targetDir,
                 parcelPackages: parcelPackages,
+                trace: args.trace,
+                profile: args.profile,
               });
               results.push({ result: benchmarkResults, benchmarkConfig });
             }
