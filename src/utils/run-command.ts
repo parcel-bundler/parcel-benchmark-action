@@ -15,6 +15,11 @@ export default async function runCommand(
         output += c.toString();
       }
     });
+    command.stderr.on('data', (c) => {
+      if (typeof c.toString !== 'undefined') {
+        output += c.toString();
+      }
+    });
   }
 
   command.stderr.pipe(process.stderr);
