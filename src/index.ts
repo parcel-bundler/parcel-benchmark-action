@@ -18,6 +18,7 @@ import gitLastCommitHash from './git/last-commit-hash';
 import BENCHMARKS_CONFIG from '../benchmarks.json';
 import runCommand from './utils/run-command';
 import { printResults } from './utils/print-results';
+import { Command, program } from 'commander';
 
 const ALLOWED_ACTIONS = new Set(['synchronize', 'opened']);
 
@@ -29,20 +30,29 @@ async function setupParcel(opts: { repoUrl: string; branch: string; outputDir: s
   await gitClone(repoUrl, outputDir);
   await gitCheckout(outputDir, branch);
 
-  console.log(`Installing ${repoUrl}...`);
+  return await installAndBuildParcel(outputDir);
+}
+
+type LinkedPackages = Array<{
+  pkgName: string;
+  directory: string;
+}>;
+
+async function installAndBuildParcel(outputDir: string) {
+  console.log(`Installing ${outputDir}...`);
   await yarnInstall(outputDir);
 
   try {
-    console.log(`Building native modules ${repoUrl}...`);
+    console.log(`Building native modules ${outputDir}...`);
     await runCommand('yarn', ['run', 'build-native-release'], { cwd: outputDir });
   } catch (e) {
     console.warn(`Building native modules failed: ${e.message}`);
   }
 
-  console.log(`Building ${repoUrl}...`);
+  console.log(`Building ${outputDir}...`);
   await runCommand('yarn', ['run', 'build'], { cwd: outputDir });
 
-  console.log(`Creating package map of ${repoUrl}...`);
+  console.log(`Creating package map of ${outputDir}...`);
   let packages = await glob(['packages/**/package.json'], {
     cwd: outputDir,
     onlyFiles: true,
@@ -66,11 +76,6 @@ async function setupParcel(opts: { repoUrl: string; branch: string; outputDir: s
 
   return packageMap;
 }
-
-type LinkedPackages = Array<{
-  pkgName: string;
-  directory: string;
-}>;
 
 async function unlinkPackages(packages: LinkedPackages) {
   for (let pkg of packages) {
@@ -145,6 +150,8 @@ async function executeBenchmark(opts: {
   };
   parcelPackages: Map<string, string>;
   parcelDir: string;
+  trace?: boolean;
+  profile?: boolean;
 }): Promise<IBenchmark | null> {
   let { benchmarkConfig, parcelPackages, parcelDir } = opts;
 
@@ -159,6 +166,8 @@ async function executeBenchmark(opts: {
     directory: benchmark.directory,
     entrypoint: benchmarkConfig.entrypoint,
     name: benchmarkConfig.name,
+    trace: opts.trace,
+    profile: opts.profile,
   };
 
   let benchmarkResult;
@@ -166,9 +175,12 @@ async function executeBenchmark(opts: {
     benchmarkResult = await runBenchmark(runBenchmarkOptions);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 
-  await cleanupBenchmark(benchmark);
+  if (!opts.trace && !opts.profile) {
+    await cleanupBenchmark(benchmark);
+  }
 
   if (benchmarkResult) {
     return benchmarkResult;
@@ -259,11 +271,69 @@ async function start() {
   if (errorCount > 0) {
     console.log('Some benchmarks failed to run...');
     console.log('Total amount of failed benchmarks:', errorCount);
-    process.exit(1);
+    process.exitCode = 1;
   }
 }
 
-start().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+function runCommandLine() {
+  const pkgJson = require('../package.json');
+  program.name('parcel-benchmark').version(pkgJson.version).description(pkgJson.description);
+  program
+    .addCommand(
+      new Command('benchmark')
+        .option(
+          '--target-dir <TARGET_DIR>',
+          'Target directory to run benchmarks against. This should be a parcel checkout'
+        )
+        .option('--benchmark [BENCHMARK]', 'Benchmark to run')
+        .option('--trace', 'Trace the builds')
+        .option('--profile', 'Profile the builds')
+        .action(async (args: { targetDir: string; benchmark: string; trace: boolean; profile: boolean }) => {
+          try {
+            const parcelPackages = await installAndBuildParcel(args.targetDir);
+
+            const results = [];
+            for (let benchmarkConfig of BENCHMARKS_CONFIG) {
+              if (args.benchmark && !benchmarkConfig.name.includes(args.benchmark)) {
+                continue;
+              }
+              const benchmarkResults = await executeBenchmark({
+                benchmarkConfig,
+                parcelDir: args.targetDir,
+                parcelPackages: parcelPackages,
+                trace: args.trace,
+                profile: args.profile,
+              });
+              results.push({ result: benchmarkResults, benchmarkConfig });
+            }
+
+            for (let result of results) {
+              if (!result.result) continue;
+              console.log(result.result.name);
+              console.log('cold build time:', result.result.cold.buildTime);
+              for (let bundleMetrics of result.result.cold.bundles) {
+                console.log('  -->', bundleMetrics.filePath, bundleMetrics.time);
+              }
+
+              console.log('warm build time:', result.result.cached.buildTime);
+              for (let bundleMetrics of result.result.cached.bundles) {
+                console.log('  -->', bundleMetrics.filePath, bundleMetrics.time);
+              }
+            }
+          } catch (err) {
+            console.error(err);
+            process.exitCode = 1;
+          }
+        })
+    )
+    .parse(process.argv);
+}
+
+if (process.env.IS_GH_ACTION === 'true') {
+  start().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+} else {
+  runCommandLine();
+}
