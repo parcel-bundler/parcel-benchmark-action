@@ -276,10 +276,8 @@ async function start() {
 }
 
 function runCommandLine() {
-  program
-    .name('parcel-benchmark')
-    .version(require('../package.json').version)
-    .description(require('../package.json').description);
+  const pkgJson = require('../package.json');
+  program.name('parcel-benchmark').version(pkgJson.version).description(pkgJson.description);
   program
     .addCommand(
       new Command('benchmark')
