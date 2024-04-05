@@ -271,7 +271,7 @@ async function start() {
   if (errorCount > 0) {
     console.log('Some benchmarks failed to run...');
     console.log('Total amount of failed benchmarks:', errorCount);
-    process.exit(1);
+    process.exitCode = 1;
   }
 }
 
@@ -324,7 +324,7 @@ function runCommandLine() {
             }
           } catch (err) {
             console.error(err);
-            process.exit(1);
+            process.exitCode = 1;
           }
         })
     )
@@ -334,7 +334,7 @@ function runCommandLine() {
 if (process.env.IS_GH_ACTION === 'true') {
   start().catch((err) => {
     console.error(err);
-    process.exit(1);
+    process.exitCode = 1;
   });
 } else {
   runCommandLine();
