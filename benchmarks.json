@@ -12,7 +12,8 @@
   {
     "name": "AtlasKit Editor",
     "directory": "ak-editor",
-    "entrypoint": "./src/index.html"
+    "entrypoint": "./src/index.html",
+    "skip": true
   },
   {
     "name": "Three.js",

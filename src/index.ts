@@ -223,6 +223,10 @@ async function start() {
   let prBenchmarks: Benchmarks = [];
   let errorCount = 0;
   for (let benchmarkConfig of BENCHMARKS_CONFIG) {
+    if (benchmarkConfig.skip) {
+      continue;
+    }
+
     // Benchmark main branch
     console.log(`Running ${benchmarkConfig.name} on main branch...`);
     let baseBenchmarkResult = await executeBenchmark({
@@ -294,9 +298,10 @@ function runCommandLine() {
 
             const results = [];
             for (let benchmarkConfig of BENCHMARKS_CONFIG) {
-              if (args.benchmark && !benchmarkConfig.name.includes(args.benchmark)) {
+              if (benchmarkConfig.skip || (args.benchmark && !benchmarkConfig.name.includes(args.benchmark))) {
                 continue;
               }
+
               const benchmarkResults = await executeBenchmark({
                 benchmarkConfig,
                 parcelDir: args.targetDir,
